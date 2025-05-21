@@ -4,7 +4,7 @@ import LocalStrategy from 'passport-local'
 import crypto from 'crypto'
 import jwt from 'jsonwebtoken'
 import { Mongo } from "../database/mongo.js"
-import { ObjectId } from 'mongodb.js'
+import { ObjectId } from 'mongodb'
 
 const collectionName = 'users'
 

@@ -29,6 +29,7 @@ async function main() {
     })
 
     app.use('/auth', authRouter)
+    app.use('/users', usersRouter)
 
     app.listen(port, () => {
         console.log(`Server running on: http://${hostname}:${port}`)

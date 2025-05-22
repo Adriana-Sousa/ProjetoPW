@@ -1,6 +1,7 @@
 import Navbar from './components/navbar/navbar'
+import Footer from './components/footer/footer'
 import { useState } from 'react'
-//import Navbar from './components/navbar/navbar.jsx'
+import { Outlet } from "react-router-dom"
 
 
 function App() {
@@ -9,7 +10,7 @@ function App() {
   	return (
 		<>
 			<Navbar />
-   		 	<div><h1>Cardápio online</h1></div>
+			<Outlet />
 		
 		</>
 	)

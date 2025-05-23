@@ -1,7 +1,7 @@
 import React from "react";
 import "./cart/page.module.css";
 
-const Carrinho = () => {
+const Cart = () => {
   // exemplo produtos p testar
   const produtos = [
     {
@@ -70,4 +70,4 @@ const Carrinho = () => {
   );
 };
 
-export default Carrinho;
+export default Cart;

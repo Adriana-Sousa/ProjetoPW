@@ -1,0 +1,51 @@
+.container-page {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header-page h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.item-produto {
+  border: 1px solid #ddd;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+}
+
+.descricao-produto {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.preco-produto {
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.btn-remover {
+  margin-top: 10px;
+  background: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.footer-page {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.btn-finalizar {
+  background: #ffa500;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}

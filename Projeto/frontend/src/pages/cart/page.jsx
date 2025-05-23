@@ -1,5 +1,5 @@
 import React from "react";
-import "./carrinho/page.module.css";
+import "./cart/page.module.css";
 
 const Carrinho = () => {
   // exemplo produtos p testar

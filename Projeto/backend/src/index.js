@@ -3,6 +3,7 @@ import cors from 'cors'
 import { Mongo } from './database/mongo.js'
 import { config } from 'dotenv' 
 import authRouter from './auth/auth.js'
+import usersRouter from './routes/users.js'
 
 config()
 async function main() {

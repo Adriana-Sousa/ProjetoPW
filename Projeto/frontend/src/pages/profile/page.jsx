@@ -12,7 +12,11 @@ export default function Profile() {
     const navigate = useNavigate()
     const authData = JSON.parse(localStorage.getItem('auth'))
 
-    
+     useEffect(() => {
+        if(!authData) {
+            navigate('/auth')
+        } 
+    }, [authData])
 
     const handleLogout = () => {
         logout()

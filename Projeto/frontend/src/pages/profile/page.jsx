@@ -1,16 +1,36 @@
-import React from "react";
-import styles from "./page.module.css";
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import authServices from "../../services/auth"
+import styles from './page.module.css'
+import { LuLogOut } from "react-icons/lu"
+import { Link } from "react-router-dom"
 
-function Profile() {
-  return (
-    <div className={styles.container}>
-      <h1>Perfil do Usuário</h1>
-      <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-          Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-          Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-          Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.".</p>
-    </div>
-  );
+
+export default function Profile() {
+    const { logout } = authServices()
+    
+    const navigate = useNavigate()
+    const authData = JSON.parse(localStorage.getItem('auth'))
+
+    
+
+    const handleLogout = () => {
+        logout()
+        return navigate('/')
+    }
+
+    
+
+    return (
+        <div className={styles.pageContainer}>
+            <div>
+                <h1>{authData?.user?.fullname}</h1>
+                <h3>{authData?.user?.email}</h3>
+            </div>
+
+            <button onClick={handleLogout}>Logout<LuLogOut /></button>
+
+            
+        </div>
+    )
 }
-
-export default Profile;

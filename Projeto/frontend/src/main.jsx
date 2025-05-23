@@ -7,8 +7,6 @@ import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 // import das pages
 import Home from './pages/home/page.jsx'
 import Cart from './pages/cart/page.jsx'
-import Cadastro from './pages/cadastro/page.jsx'
-import Login from './pages/login/page.jsx'
 import Profile from './pages/profile/page.jsx'
 import Plates from './pages/plates/page.jsx'
 import Auth from './pages/auth/page.jsx'
@@ -19,8 +17,6 @@ const pages = createBrowserRouter([
         element: <App />,
         children: [
             { path: '/', element: <Home /> },
-            { path: "/cadastro", element: <Cadastro /> },
-            { path: "/login", element: <Login /> },
             { path: '/cart', element: <Cart /> },
             { path: '/profile', element: <Profile /> },
             { path: '/plates', element: <Plates /> },

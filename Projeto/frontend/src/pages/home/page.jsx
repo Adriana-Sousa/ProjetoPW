@@ -1,19 +1,16 @@
-//import Dessert from '../../../public/imgs/homepage/dessert'
-//import NaturalFood from '../../../public/imgs/homepage/naturalFood'
-//import Vegetable from '../../../public/imgs/homepage/vegetable'
-//import { FaMapMarkerAlt, FaFacebookSquare, FaInstagram, FaWhatsapp } from "react-icons/fa"
 import React from "react";
+import { Link } from 'react-router-dom'
+import styles from './page.module.css'
+
 export default Home;
-import Login from "../pages/login/page.jsx";
-import Cadastro from "../pages/cadastro/page.jsx";
+
 
 function Home() {
   return (
     <div>
       <h1>Bem-vindo à Home</h1>
-      <Login />
-      <Cadastro />
-      <p>Esta é a página inicial do sistema.</p>
+      <br />
+      <p>Um cardápio online, simples para usar, veja as nossas opções de pratos. <Link to={'/auth'} className={styles.Link}>Entrar</Link></p>
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import styles from './navbar.module.css'
-import { LuShoppingCart, LuUser, LuMenu } from "react-icons/lu"
+import { LuUser, LuMenu } from "react-icons/lu"
 import { Drawer } from '@mui/material'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -18,11 +18,7 @@ import { Link } from 'react-router-dom'
                     <img className={styles.logo} src="/imgs/logo.png" alt="" />
                 </Link>
                  <div className={styles.navbarLinksContainer}>
-                    <Link to={'/'} className={styles.navbarLink}>Home</Link>
-                    <Link to={'/plates'} className={styles.navbarLink}>Plates</Link>
-                    <Link to={'/cart'}>
-                        <LuShoppingCart className={styles.navbarLink} />
-                    </Link>
+                    <Link to={'/home'} className={styles.navbarLink}>Home</Link>
                     <Link to={'/profile'}>
                         <LuUser className={styles.navbarLink} />
                     </Link>
@@ -34,9 +30,6 @@ import { Link } from 'react-router-dom'
                     <img className={styles.logo} src="/imgs/logo.png" alt="" />
                 </Link>
                 <div className={styles.mobileNavbarBtns}>
-                    <Link to={'/cart'}>
-                        <LuShoppingCart className={styles.navbarLink} />
-                    </Link>
                     <LuMenu className={styles.navbarLink} onClick={handleOpenMenu}/>
                 </div>
             </div>
@@ -47,7 +40,6 @@ import { Link } from 'react-router-dom'
             >
                 <div className={styles.drawer}>
                     <Link to={'/'} className={styles.navbarLink} onClick={handleOpenMenu}>Home</Link>
-                    <Link to={'/plates'} className={styles.navbarLink} onClick={handleOpenMenu}>Plates</Link>
                     <Link to={'/profile'} className={styles.navbarLink} onClick={handleOpenMenu}>Profile</Link>
                 </div>
             </Drawer>

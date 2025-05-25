@@ -1,0 +1,5 @@
+export default function Pedidos() {
+    return (
+        <h1>pedidos dos clientes</h1>
+    )
+}

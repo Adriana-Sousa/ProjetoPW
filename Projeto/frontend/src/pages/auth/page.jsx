@@ -16,7 +16,13 @@ export default function Auth() {
 
     useEffect(() => {
         if(authData) {
-             navigate('/profile')
+            if (authData.user.role === "admin") {
+                navigate('/admin')
+            }
+            else {
+                navigate('/user')
+            }
+             
         }
     }, [authData])
 

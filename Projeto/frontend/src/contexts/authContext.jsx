@@ -21,3 +21,7 @@ export const AuthProvider = ({ children }) => {
 };
 
 export const useAuth = () => useContext(AuthContext);
+const authData = JSON.parse(localStorage.getItem('auth'))
+  
+export const autenticado = authData? true : false
+export const adminRole = authData?.user?.role === "admin" ? true: false

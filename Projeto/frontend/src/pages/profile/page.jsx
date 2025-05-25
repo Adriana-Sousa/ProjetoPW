@@ -6,6 +6,8 @@ import styles from './page.module.css'
 import { LuLogOut, LuTimer, LuCircleAlert, LuCheck } from "react-icons/lu"
 import { Link } from "react-router-dom"
 import Loading from "../loading/page"
+import { adminRole, autenticado } from "../../contexts/authContext"
+import Auth from "../auth/page"
 
 export default function Profile() {
     const { logout } = authServices()
@@ -21,9 +23,7 @@ export default function Profile() {
         }
     }, [authData, refetchOrders])
 
-    if(orderLoading) {
-        return( <Loading /> )
-    }
+
 
     const handleLogout = () => {
         logout()
@@ -35,36 +35,18 @@ export default function Profile() {
 
     return (
         <div className={styles.pageContainer}>
-            <div>
+              {
+                autenticado? <div> <div>
                 <h1>{authData?.user?.fullname}</h1>
                 <h3>{authData?.user?.email}</h3>
             </div>
 
-            <button onClick={handleLogout}>Logout<LuLogOut /></button>
+            <button onClick={handleLogout}>Logout<LuLogOut /></button> </div>
 
-            {ordersList.length > 0 ? 
-                <div className={styles.ordersContainer}>
-                    {ordersList.map((order) => (
-                        <div key={order._id} className={styles.orderContainer}>
-                            {order.pickupStatus === 'Pending' ? <p className={`${styles.pickupStatus} ${styles.pending}`}><LuTimer />{order.pickupStatus}</p> : null}
-                            {order.pickupStatus === 'Completed' ? <p className={`${styles.pickupStatus} ${styles.completed}`}><LuCheck />{order.pickupStatus}</p> : null}
-                            {order.pickupStatus === 'Canceled' ? <p className={`${styles.pickupStatus} ${styles.canceled}`}><LuCircleAlert />{order.pickupStatus}</p> : null}
-                            <h3>{order.pickupTime}</h3>
-                            {order.orderItems.map((item)=> (
-                                <div key={item._id}>
-                                    <h4>{item.itemDetails[0].name}</h4>
-                                    <p>Quantity: {item.quantity}</p>
-                                </div>
-                            ))}
-                        </div>
-                    ))}
-                </div>
-            : 
-                <div>
-                    Você não tem nenhum pedido ainda. 
-                    <Link to={'/plates'} className={styles.platesLink}>Clique aqui para ver o cardápio!</Link>
-                </div>
-            }
-        </div>
+              : <Auth /> 
+              }
+               
+            </div>
+       
     )
 }

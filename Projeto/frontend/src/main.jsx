@@ -18,6 +18,7 @@ import VerUsers from './pages/admin/users/users.jsx'
 import OrdersUsers from './pages/client/orders/orders.jsx'
 import CartUsers from './pages/client/cart/page.jsx'
 import Unauthorized from './pages/Unauthorized.jsx'
+import Notfound from './pages/notFound.jsx'
 
 const pages = createBrowserRouter([
     {
@@ -37,7 +38,7 @@ const pages = createBrowserRouter([
             { path: '/admin/pratos', element: <PlatesAdmin /> },
             { path: '/admin/pratos/add', element: <AddPlates /> },
             { path: '/admin/users', element: <VerUsers /> },
-            { path: '/*', element: <Unauthorized /> },
+            { path: '/*', element: <Notfound /> },
         ]
     }
 ])

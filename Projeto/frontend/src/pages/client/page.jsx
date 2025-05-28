@@ -1,10 +1,10 @@
-// src/pages/UserHome.jsx
-import { Card, CardContent, Typography, Grid, CardActionArea } from "@mui/material";
+import { Card, CardContent, Typography, Grid } from "@mui/material";
 import { IoMdRestaurant } from "react-icons/io";
 import { FaOpencart } from "react-icons/fa";
 import { LuHistory } from "react-icons/lu";
 import { MdAccountCircle } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import styles from "./UserHome.module.css";
 
 export default function UserHome() {
   const navigate = useNavigate();
@@ -12,53 +12,63 @@ export default function UserHome() {
   const features = [
     {
       title: "Ver Cardápio",
-      description: "Explore os pratos disponíveis no nosso cardápio.",
-      icon: <IoMdRestaurant fontSize="large" />,
+      description: "Explore nossa seleção de pratos deliciosos e faça seu pedido.",
+      icon: <IoMdRestaurant className={styles.featureIcon} />,
       path: "/user/plates",
     },
     {
-      title: "Meus Carrinho",
-      description: "Acompanhe seus pedidos e o status da entrega.",
-      icon: <FaOpencart fontSize="large" />,
+      title: "Meu Carrinho",
+      description: "Confira os itens no seu carrinho e finalize sua compra.",
+      icon: <FaOpencart className={styles.featureIcon} />,
       path: "/user/carts",
     },
     {
-      title: "Histórico",
-      description: "Veja todos os seus pedidos anteriores.",
-      icon: <LuHistory fontSize="large" />,
+      title: "Histórico de Pedidos",
+      description: "Acesse o histórico dos seus pedidos anteriores.",
+      icon: <LuHistory className={styles.featureIcon} />,
       path: "/user/meus-pedidos",
     },
     {
       title: "Minha Conta",
-      description: "Gerencie suas informações pessoais.",
-      icon: <MdAccountCircle fontSize="large" />,
+      description: "Gerencie seu perfil e informações pessoais.",
+      icon: <MdAccountCircle className={styles.featureIcon} />,
       path: "/profile",
     },
   ];
 
   return (
-    <div style={{ padding: "2rem" }}>
-      <Typography variant="h4" gutterBottom>
-        Bem-vindo ao Sistema de Cardápio Online
+    <section className={styles.container}>
+      <Typography
+        variant="h4"
+        component="h1"
+        className={styles.title}
+        aria-label="Bem-vindo ao Sistema de Cardápio Online"
+      >
+        Bem-vindo ao Nosso Cardápio Online
       </Typography>
-
-      <Grid container spacing={4}>
+      <br />
+      <Grid container spacing={3} className={styles.grid}>
         {features.map((feature, index) => (
           <Grid item xs={12} sm={6} md={3} key={index}>
-            <Card>
-              <CardActionArea onClick={() => navigate(feature.path)}>
-                <CardContent style={{ textAlign: "center" }}>
-                  <div style={{ marginBottom: "1rem" }}>{feature.icon}</div>
-                  <Typography variant="h6">{feature.title}</Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    {feature.description}
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
+            <Card
+              className={styles.card}
+              onClick={() => navigate(feature.path)}
+              role="button"
+              aria-label={`Navegar para ${feature.title}`}
+            >
+              <CardContent className={styles.cardContent}>
+                <div className={styles.iconWrapper}>{feature.icon}</div>
+                <Typography variant="h6" component="h2" className={styles.cardTitle}>
+                  {feature.title}
+                </Typography>
+                <Typography variant="body2" className={styles.cardDescription}>
+                  {feature.description}
+                </Typography>
+              </CardContent>
             </Card>
           </Grid>
         ))}
       </Grid>
-    </div>
+    </section>
   );
 }

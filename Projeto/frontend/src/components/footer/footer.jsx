@@ -1,21 +1,11 @@
-import styles from './footer.module.css'
-import { Link } from 'react-router-dom'
+import './footer.css';
 
-export default function Footer() {
-    return (
-        <footer className={styles.footerContainer}>
-            <img src="/imgs/logo.png" alt="" />
-            <div>
-                <h2>Important Links</h2>
-                <div className={styles.linksContainer}>
-                    <Link className={styles.link} to={'/'}>Homepage</Link>
-                    <Link className={styles.link} to={'/plates'}>Plates</Link>
-                    <Link className={styles.link} to={'/profile'}>Profile</Link>
-                </div>
-            </div>
-            <div>
-                Developed by Adriana Sousa and Natalia.
-            </div>
-        </footer>
-    )
+function Footer() {
+  return (
+    <footer>
+      <p>&copy; 2025 It's Tasty. Todos os direitos reservados. Projeto PW - Nat e Drica/ Imagens por www.freepik.com</p>
+    </footer>
+  )
 }
+
+export default Footer;

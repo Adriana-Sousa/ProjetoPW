@@ -1,29 +1,42 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiHome } from 'react-icons/fi';
-import bgImage from '../../assets/CARDAPIO.jpg';
+import bgImage from '../../assets/CARDAPIO.JPG';
 import api from '../../services/api';
 import './cardapio.css';
+import platesServices from '../../services/plates';
+import { autenticado } from '../../context/authContext';
+import { adminRole } from '../../context/authContext';
 
 function CardapioPublico() {
   const [pratos, setPratos] = useState([]);
-  const [pratoSelecionado, setPratoSelecionado] = useState(null);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchPratos = async () => {
-      try {
-        const response = await api.get('/plates');
-        console.log(response.data);
-        console.log(response.data.body[0]);
-        setPratos(response.data.body);
-      } catch (error) {
-        console.error('Erro ao buscar pratos:', error);
-      }
-    };
-
-    fetchPratos();
-  }, []);
+    const [pratoSelecionado, setPratoSelecionado] = useState(null);
+    const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
+    //const { carrinho, adicionarAoCarrinho } = useCarrinho();
+  
+    const navigate = useNavigate();
+      const { getPlates, updatePlate, deletePlate, platesLoading, platesList, refetchPlates, setRefetchPlates } = platesServices();
+      const [editingPlate, setEditingPlate] = useState(null);
+      const [formData, setFormData] = useState({
+        name: "",
+        description: "",
+        ingredients: [],
+        price: "",
+        available: true,
+        category: "",
+      });
+      const [newIngredient, setNewIngredient] = useState("");
+      const [error, setError] = useState("");
+    
+      const categories = ["Entradas", "Pratos Principais", "Sobremesas", "Bebidas"];
+    
+      useEffect(() => {
+        
+          getPlates();
+          setPratos(platesList)
+          
+        
+      }, [autenticado, adminRole, navigate, getPlates, refetchPlates]);
 
   const abrirModal = (prato) => {
     setPratoSelecionado(prato);
@@ -41,7 +54,7 @@ function CardapioPublico() {
       </nav>
 
       <div className="pratos-grid">
-        {pratos.map((prato) => (
+        {platesList.map((prato) => (
           <div key={prato._id} className="prato-card" onClick={() => abrirModal(prato)}>
             <img src={prato.imgUrl} alt={prato.name} />
             <p>{prato.name}</p>

@@ -1,8 +1,10 @@
 import './login.css';
-import bgImage from '../../assets/FOTOBASE.jpg';
+import bgImage from '../../assets/FOTOBASE.JPG';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiHome } from 'react-icons/fi';
  import { useState } from 'react';
+ import authServices from '../../services/auth';
+ import { useEffect } from 'react';
 
 function Login() {
   const navigate = useNavigate();
@@ -10,33 +12,37 @@ function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleLogin = () => {
-    // autenticação
-    // checar se email e senha não estão vazios
-    if (email && password) {
-      //autenticar com o backend  
-fetch('http://localhost:3000/api/login', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ email, password }),
-})
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      navigate('/cardapio');
-    } else {
-      alert('E-mail ou senha incorretos.');
-    }
-  })
-  .catch(error => {
-    console.error('Erro ao fazer login:', error);
-    alert('Erro ao conectar com o servidor.');
-  });
-      navigate('/'); 
-    } else {
-      alert('Por favor, preencha o e-mail e a senha.');
-    }
-  };
+  const authData = JSON.parse(localStorage.getItem('auth'))
+      const { login, signup, authLoading } = authServices()
+      const [formData, setFormData] = useState(null)
+      const [error, setError] = useState("");
+      const [success, setSuccess] = useState("");
+      
+          useEffect(() => {
+              if(authData) {
+                  
+                      navigate('/cardapio')
+                  }
+                   
+              
+          }, [authData])
+  
+      // função para enviar forms
+      const handleSubmitForm = (e) => {
+          e.preventDefault()
+              console.log(formData)
+          login(formData)
+                  
+      }
+  
+       // função para mudar os dados
+      const handleFormDataChange = (e) => {
+          setFormData({
+              ...formData,
+              [e.target.name]: e.target.value
+          })
+          console.log(formData)
+      }
 
   return (
     <div
@@ -50,25 +56,19 @@ fetch('http://localhost:3000/api/login', {
           </Link>
         </div>
       <h1>LOGIN</h1>
-      <div className="input-group">
+      <form onSubmit={handleSubmitForm}>
+        
+        <div className="input-group" >
         <span className="icon">🔒</span>
-        <input
-          type="text"
-          placeholder="E-mail"
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-        />
+        <input type="email" name='email' placeholder="User" onChange={handleFormDataChange} required/>
       </div>
       <div className="input-group">
         <span className="icon">🔑</span>
-        <input
-          type="password"
-          placeholder="Senha"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-        />
+        <input type="password" name='password' placeholder="Senha" onChange={handleFormDataChange} required />
       </div>
-      <button className="login-button" onClick={handleLogin}>Entrar</button>
+      
+      <button type='submit' className="login-button" >Entrar</button>
+        </form>
 
       <Link to="/cadastro" className="cadastro-link">Cadastre-se</Link>
       <Link to="/loginadm" className="admin-link">Login como Administrador</Link>

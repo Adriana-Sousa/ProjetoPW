@@ -1,9 +1,17 @@
 import { Link } from 'react-router-dom';
 import './home.css';
 import bgImage from '../../assets/HOME.jpg';
+import { autenticado } from '../../context/authContext';
+import { adminRole } from '../../context/authContext';
+import AdminPage from '../admin/admin';
+import Cardapio from '../cardapio/cardapio';
+
 
 function Home() {
-  return (<div 
+  return (
+  <>
+  {
+          autenticado?  adminRole? <AdminPage /> : <Cardapio /> : <div 
       className="home-page" 
       style={{ backgroundImage: `url(${bgImage})` }}
     >
@@ -12,14 +20,17 @@ function Home() {
         <Link to="/login">
           <button className="home-button">Entrar</button>
         </Link>
-        <Link to="/cardapio">
+        <Link to="/cardapio-publico">
           <button className="home-button">Ver Cardápio</button>
         </Link>
         <p>
           Não tem uma conta? <Link to="/cadastro">Cadastre-se</Link>
         </p>
       </div>
-    </div>
+    </div> 
+        }
+  </>
+  
   );
 }
 

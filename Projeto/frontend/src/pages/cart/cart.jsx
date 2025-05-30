@@ -2,25 +2,17 @@ import './cart.css';
 import { FiArrowLeft, FiTrash2 } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import { useCarrinho } from '../../context/carrinhoContext';
 
 function Carrinho() {
-  const [itens, setItens] = useState([
-    { id: 1, nome: 'Prato 1', imagem: '/assets/prato1.jpg', preco: 25.99 },
-    { id: 2, nome: 'Prato 2', imagem: '/assets/prato2.png', preco: 30.50 },
-  ]);
+  const { carrinho, removerItem, incrementarQuantidade, decrementarQuantidade, total, limparCarrinho } = useCarrinho();
 
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const navigate = useNavigate();
 
-  const total = itens.reduce((acc, item) => acc + item.preco, 0).toFixed(2);
-
-  const removerItem = (id) => {
-    const novosItens = itens.filter(item => item.id !== id);
-    setItens(novosItens);
-  };
-
   const finalizarCompra = () => {
     setMostrarPopup(true);
+    limparCarrinho();
   };
 
   const continuarComprando = () => {
@@ -42,30 +34,37 @@ function Carrinho() {
         <h1>Carrinho</h1>
       </header>
 
-      {itens.length === 0 ? (
+      {carrinho.length === 0 ? (
         <p className="carrinho-vazio">Seu carrinho está vazio.</p>
       ) : (
         <div className="carrinho-itens">
-          {itens.map((item) => (
-            <div key={item.id} className="carrinho-item">
-              <img src={item.imagem} alt={item.nome} />
+          {carrinho.map((item) => (
+            <div key={item._id} className="carrinho-item">
+              <img src={item.imgUrl} alt={item.name} />
+            <div className="item-info-e-controle"> 
               <div className="item-info">
-                <p>{item.nome}</p>
-                <span>R$ {item.preco.toFixed(2)}</span>
+                <p>{item.name}</p>
+                <span>R$ {item.price.toFixed(2)}</span>
+                <div className="quantidade-controle">
+                  <button onClick={() => decrementarQuantidade(item._id)}>-</button>
+                  <span>{item.quantidade}</span>
+                  <button onClick={() => incrementarQuantidade(item._id)}>+</button>
+                </div>
               </div>
+            </div>
               <FiTrash2
                 className="item-remove"
                 size={20}
-                onClick={() => removerItem(item.id)}
+                onClick={() => removerItem(item._id)}
               />
             </div>
           ))}
         </div>
       )}
 
-      {itens.length > 0 && (
+      {carrinho.length > 0 && (
         <div className="carrinho-footer">
-          <p>Total: <strong>R$ {total}</strong></p>
+          <p>Total: <strong>R$ {total.toFixed(2)}</strong></p>
           <button className="carrinho-finalizar" onClick={finalizarCompra}>
             Finalizar Compra
           </button>

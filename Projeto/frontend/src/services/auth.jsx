@@ -1,7 +1,10 @@
 import { useState } from "react";
 
+
 export default function authServices() {
     const [authLoading, setAuthLoading] = useState(false)
+    const [error, setError] = useState("");
+    const [success, setSucces] = useState("");
 
     const url = 'http://localhost:3000/auth'
 
@@ -24,10 +27,14 @@ export default function authServices() {
                     'auth',
                     JSON.stringify({ token: result.body.token, user: result.body.user })
                 )
+
             }
         })
         .catch((error) => {
             console.log(error)
+            console.log(formData)
+            alert("Erro ao realizar login")
+            
         })
         .finally(() => {
             setAuthLoading(false)
@@ -36,6 +43,7 @@ export default function authServices() {
 
     const logout = () => {
         localStorage.removeItem('auth')
+        localStorage.removeItem('carrinho')
     }
 
     const signup = (formData) => {
@@ -60,6 +68,7 @@ export default function authServices() {
         })
         .catch((error) => {
             console.log(error)
+            alert("Erro se cadastrar")
         })
         .finally(() => {
             setAuthLoading(false)

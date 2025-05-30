@@ -1,68 +1,93 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiHome, FiShoppingCart } from 'react-icons/fi';
 import bgImage from '../../assets/CARDAPIO.jpg';
-
-import prato1 from '../../assets/prato1.jpg';
-import prato2 from '../../assets/prato2.jpg';
-import prato3 from '../../assets/prato3.png';
-import prato4 from '../../assets/prato4.png';
-import prato5 from '../../assets/prato5.png';
-import prato6 from '../../assets/prato6.png';
-
+import api from '../../services/api';
 import './cardapio.css';
 
 function Cardapio() {
+  const [pratos, setPratos] = useState([]);
   const [carrinho, setCarrinho] = useState([]);
+  const [pratoSelecionado, setPratoSelecionado] = useState(null);
   const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
 
-  const pratos = [
-    { id: 1, nome: 'Prato 1', imagem: prato1 },
-    { id: 2, nome: 'Prato 2', imagem: prato2 },
-    { id: 3, nome: 'Prato 3', imagem: prato3 },
-    { id: 4, nome: 'Prato 4', imagem: prato4 },
-    { id: 5, nome: 'Prato 5', imagem: prato5 },
-    { id: 6, nome: 'Prato 6', imagem: prato6 },
-  ];
+  useEffect(() => {
+    const fetchPratos = async () => {
+      try {
+        const response = await api.get('/plates');
+        setPratos(response.data.body);
+      } catch (error) {
+        console.error('Erro ao buscar pratos:', error);
+      }
+    };
+
+    fetchPratos();
+  }, []);
 
   const adicionarAoCarrinho = (prato) => {
     setCarrinho([...carrinho, prato]);
   };
-  
+
   return (
-    <div className="cardapio-page" style={{ backgroundImage: `url(${bgImage})` }}>
-      <nav className="cardapio-navbar">
-        <h1 className="cardapio-title">Cardápio</h1>
-        <Link to="/" className="nav-icon"><FiHome size={24} /></Link>
-        <div className="carrinho-container">
-          <FiShoppingCart size={24} className="nav-icon" onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
-          {mostrarCarrinho && (
-            <div className="carrinho-dropdown">
-              {carrinho.length === 0 ? <p>Vazio</p> :
-                carrinho.map((item, index) => (
-                  <div key={index} className="carrinho-item">
-                    <img src={item.imagem} alt={item.nome} />
-                    <span>{item.nome}</span>
-                  </div>
-                ))
-              }
-              <Link to="/cart" className="ir-para-carrinho">
-                     Ir para o Carrinho →
-              </Link>
-            </div>
-          )}
+    <>
+      <h1 className="cardapio-title">Cardápio</h1>
+      <div className="cardapio-page" style={{ backgroundImage: `url(${bgImage})` }}>
+        <nav className="cardapio-navbar">
+          <Link to="/" className="nav-icon"><FiHome size={24} /></Link>
+          <div className="carrinho-container">
+            <FiShoppingCart size={24} className="nav-icon" onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
+            {carrinho.length > 0 && (
+              <span className="carrinho-count">{carrinho.length}</span>
+            )}   
+            {mostrarCarrinho && (
+              <div className="carrinho-dropdown">
+    {carrinho.length === 0 ? (
+      <p>Vazio</p>
+    ) : (
+      <>
+        {carrinho.map((item, index) => (
+          <div key={index} className="carrinho-item">
+            <img src={item.imgUrl} alt={item.name} />
+            <span>{item.name}</span>
+          </div>
+        ))}
+        <div className="carrinho-resumo">
+          <p><strong>Total de itens:</strong> {carrinho.length}</p>
+          <p><strong>Soma:</strong> R$ {carrinho.reduce((total, item) => total + item.price, 0).toFixed(2)}</p>
+        </div>
+      </>
+    )}
+    <Link to="/cart" className="ir-para-carrinho">
+           Ir para o Carrinho →
+    </Link>
+  </div>
+)}
         </div>
       </nav>
-
+      {pratoSelecionado && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h2>{pratoSelecionado.name}</h2>
+            <img src={pratoSelecionado.imgUrl} alt={pratoSelecionado.name} style={{width: '100%', borderRadius: '5px', marginBottom: '1rem'}} />
+            <p style={{marginBottom: '1rem'}}>{pratoSelecionado.description}</p>
+            <p style={{fontWeight: 'bold', marginBottom: '1rem'}}>R$ {pratoSelecionado.price.toFixed(2)}</p>
+            <div className="modal-buttons">
+              <button className="modal-button" onClick={() => { adicionarAoCarrinho(pratoSelecionado); setPratoSelecionado(null); }}>Adicionar ao carrinho</button>
+              <button className="modal-button-outline" onClick={() => setPratoSelecionado(null)}>Fechar</button>
+            </div>
+          </div>
+        </div>
+      )}
       <div className="pratos-grid">
         {pratos.map((prato) => (
-          <div key={prato.id} className="prato-card" onClick={() => adicionarAoCarrinho(prato)}>
-            <img src={prato.imagem} alt={prato.nome} />
-            <p>{prato.nome}</p>
+          <div key={prato._id} className="prato-card" onClick={() => { setPratoSelecionado(prato); }}>
+            <img src={prato.imgUrl} alt={prato.name} />
+            <p>{prato.name}</p>
           </div>
         ))}
       </div>
     </div>
+    </>
   );
 }
 

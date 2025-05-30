@@ -3,8 +3,11 @@ import bgImage from '../../assets/FOTOBASE.jpg';
 import { Link } from 'react-router-dom';
 import { FiHome } from 'react-icons/fi';
 import { useState } from 'react';
+import authServices from '../../services/auth';
 
 function Cadastro() {
+  const [formData, setFormData] = useState(null)
+  const { login, signup, authLoading } = authServices()
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -13,7 +16,9 @@ function Cadastro() {
         setFormData({
             ...formData,
             [e.target.name]: e.target.value
+          
         })
+        console.log(formData)
     }
 
   // função para enviar forms
@@ -26,8 +31,8 @@ function Cadastro() {
       setError("Insira um e-mail válido.");
       return;
     }
-    if (!formData.role) {
-      setError("Selecione uma função.");
+    if (formData.password !== formData.confirmPassword) {
+      setError("As senhas não combinam.");
       return;
     }
     if (formData.password && formData.password.length < 6) {
@@ -38,9 +43,11 @@ function Cadastro() {
     try {
       e.preventDefault()
       console.log(formData)
-      singup(FormData)
+      console.log("ola")
+      signup(FormData)
     } catch (error) {
       setError("Falha ao cadastrar o usuário. Tente novamente.");
+      console.log(error)
     }
   };
 
@@ -57,11 +64,21 @@ function Cadastro() {
           </Link>
         </div>
         <h1>CADASTRO</h1>
-        <input type="email" placeholder="Email" />
-        <input type="text" placeholder="User" />
-        <input type="password" placeholder="Senha" />
-        <input type="password" placeholder="Confirmar Senha" />
-        <button className="cadastro-button">Cadastrar</button>
+        {error && <p className="error">{error}</p>}
+        <form onSubmit={handleSubmitForm}>
+        <input type="email"
+                name="email" placeholder="Email"
+                onChange={handleFormDataChange} />
+        <input  type="fullname"
+                name="fullname" placeholder="User"
+                onChange={handleFormDataChange} />
+        <input type="password"
+                name="password" placeholder="Senha"
+                onChange={handleFormDataChange} />
+        <input type="password" name="confirmPassword" placeholder="Confirmar Senha"
+              onChange={handleFormDataChange} />
+        <button className="cadastro-button" type="submit" >Cadastrar</button>
+        </form>
         <p className="login-link">
           Já tem uma conta? <Link to="/login">Entrar</Link>
         </p>

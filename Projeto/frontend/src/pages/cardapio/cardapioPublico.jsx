@@ -53,7 +53,7 @@ function CardapioPublico() {
         <div className="modal-overlay" onClick={fecharModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>{pratoSelecionado.name}</h2>
-            <p style={{ marginBottom: '1rem' }}>Para adicionar você precisa estar logado.</p>
+            <p style={{ marginBottom: '1rem' }}>Para adicionar, entre na sua conta.</p>
             <div className="modal-buttons">
               <button className="modal-button" onClick={() => navigate('/login')}>Entrar</button>
               <button className="modal-button-outline" onClick={() => navigate('/cadastro')}>Cadastrar-se</button>

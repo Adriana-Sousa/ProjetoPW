@@ -1,10 +1,34 @@
 import './admin.css';
-import bgImage from '../../assets/FOTOBASE.jpg';
+import bgImage from '../../assets/FOTOBASE.JPG';
 import { Link } from 'react-router-dom';
 import { FiLogOut } from 'react-icons/fi';
 import { MdRestaurantMenu } from 'react-icons/md';
+import authServices from '../../services/auth';
+import { Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import platesServices from '../../services/plates';
+import { useEffect } from 'react';
+
 
 function AdminPage() {
+    const { logout } = authServices()
+    const navigate = useNavigate()
+
+    const authData = JSON.parse(localStorage.getItem('auth'))
+    
+        useEffect(() => {
+            if(!authData) {
+               
+                navigate('/')
+            }
+        }, [authData])
+
+    const handleLogout = () => {
+        logout()
+        navigate('/')
+        alert("Logout realizado.")
+        
+    }
   return (
     <div 
       className="admin-page"
@@ -45,12 +69,12 @@ function AdminPage() {
           </form>
         </section>
         <div className="admin-icons-links">
-          <Link to="/cardapio" className="admin-icon-link" title="Área de Cardápio">
+          <Link to="/cardapio-publico" className="admin-icon-link" title="Área de Cardápio">
           <MdRestaurantMenu size={24} />
           </Link>
-          <Link to="/" className="admin-icon-link" title="Sair">
+          <button onClick={handleLogout} className="admin-icon" title="Sair">
           <FiLogOut size={24} />
-          </Link>
+          </button>
         </div>
       </div>
     </div>

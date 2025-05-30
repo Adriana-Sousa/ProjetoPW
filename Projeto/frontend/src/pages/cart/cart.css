@@ -56,15 +56,23 @@
 }
 
 .carrinho-item img {
-  width: 80px;
-  height: 80px;
+  width: 120px;
+  height: 120px;
   object-fit: cover;
   border-radius: 8px;
+}
+
+.item-info-e-controle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: 1; 
 }
 
 .item-info {
   flex: 1;
 }
+
 .quantidade-controles {
   display: flex;
   align-items: center;
@@ -161,7 +169,7 @@
 
 .popup-buttons button {
   padding: 0.75rem 1.5rem;
-  background-color: #222; /* botões escuros */
+  background-color: #222; 
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -172,4 +180,38 @@
 .popup-buttons button:hover {
   background-color: #000;
   transform: translateY(-2px);
+}
+
+.quantidade-controle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.quantidade-controle button {
+  width: 28px;
+  height: 28px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--cor-destaque);
+  border-radius: 6px;
+  color: var(--cor-destaque);
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.quantidade-controle button:hover {
+  background-color: var(--cor-destaque);
+  color: #fff;
+  transform: scale(1.1);
+}
+
+.quantidade-controle span {
+  min-width: 22px;
+  text-align: center;
+  font-weight: 600;
+  color: var(--cor-texto);
 }

@@ -1,41 +1,70 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiHome, FiShoppingCart } from 'react-icons/fi';
-import bgImage from '../../assets/CARDAPIO.jpg';
+import bgImage from '../../assets/CARDAPIO.JPG';
 import api from '../../services/api';
 import './cardapio.css';
 import { useCarrinho } from '../../context/carrinhoContext';
+import platesServices from '../../services/plates';
+//import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { autenticado } from '../../context/authContext';
+import { adminRole } from '../../context/authContext';
+import { FiLogOut } from 'react-icons/fi';
+import authServices from '../../services/auth';
 
 function Cardapio() {
+    const { logout } = authServices()
   const [pratos, setPratos] = useState([]);
   const [pratoSelecionado, setPratoSelecionado] = useState(null);
   const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
   const { carrinho, adicionarAoCarrinho } = useCarrinho();
 
-  useEffect(() => {
-    const fetchPratos = async () => {
-      try {
-        const response = await api.get('/plates');
-        setPratos(response.data.body);
-      } catch (error) {
-        console.error('Erro ao buscar pratos:', error);
+  const navigate = useNavigate();
+    const { getPlates, updatePlate, deletePlate, platesLoading, platesList, refetchPlates, setRefetchPlates } = platesServices();
+    const [editingPlate, setEditingPlate] = useState(null);
+    const [formData, setFormData] = useState({
+      name: "",
+      description: "",
+      ingredients: [],
+      price: "",
+      available: true,
+      category: "",
+    });
+    const [newIngredient, setNewIngredient] = useState("");
+    const [error, setError] = useState("");
+  
+    const categories = ["Entradas", "Pratos Principais", "Sobremesas", "Bebidas"];
+  
+    useEffect(() => {
+      if (!autenticado) {
+        navigate("/auth");
+      } else if (refetchPlates) {
+        getPlates();
+        setPratos(platesList)
+        
       }
-    };
+    }, [autenticado, adminRole, navigate, getPlates, refetchPlates]);
 
-    fetchPratos();
-  }, []);
+  
 
 
   const adicionarItem = (prato) => {
     adicionarAoCarrinho(prato);
   };
 
+  const handleLogout = () => {
+        logout()
+        alert("Logout realizado.")
+        return navigate('/')
+    }
   return (
     <>
       <h1 className="cardapio-title">Cardápio</h1>
       <div className="cardapio-page" style={{ backgroundImage: `url(${bgImage})` }}>
         <nav className="cardapio-navbar">
           <Link to="/" className="nav-icon"><FiHome size={24} /></Link>
+          <button onClick={handleLogout} className="admin-icon" title="Sair"></button>
           <div className="carrinho-container">
             <FiShoppingCart size={24} className="nav-icon" onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
             {carrinho.length > 0 && (
@@ -81,7 +110,7 @@ function Cardapio() {
         </div>
       )}
       <div className="pratos-grid">
-        {pratos.map((prato) => (
+        {platesList.map((prato) => (
           <div key={prato._id} className="prato-card" onClick={() => { setPratoSelecionado(prato); }}>
             <img src={prato.imgUrl} alt={prato.name} />
             <p>{prato.name}</p>

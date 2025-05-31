@@ -61,3 +61,16 @@
 .cadastro-container p a:hover {
   color: var(--cor-destaque);
 }
+
+.error {
+  color: red;
+  margin: 10px 0;
+}
+.success {
+  color: green;
+  margin: 10px 0;
+}
+.loading {
+  color: #666;
+  margin: 10px 0;
+}

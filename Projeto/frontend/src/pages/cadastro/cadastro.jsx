@@ -1,58 +1,67 @@
 import './cadastro.css';
-import bgImage from '../../assets/FOTOBASE.jpg';
-import { Link } from 'react-router-dom';
+import bgImage from '../../assets/FOTOBASE.JPG';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiHome } from 'react-icons/fi';
-import { useState } from 'react';
-import authServices from '../../services/auth';
+import { useState, useEffect } from 'react';
+import AuthServices from '../../services/auth';
 
 function Cadastro() {
-  const [formData, setFormData] = useState(null)
-  const { login, signup, authLoading } = authServices()
+  const [formData, setFormData] = useState({
+    fullname: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const { signup, authLoading, error, success, getAuthData } = AuthServices();
+  const navigate = useNavigate();
 
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-   // função para mudar os dados
-    const handleFormDataChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-          
-        })
-        console.log(formData)
+  // Verifica se o usuário já está logado
+  useEffect(() => {
+    const authData = getAuthData();
+    if (authData) {
+      navigate('/'); // Redireciona para a página inicial se já estiver logado
     }
+  }, [getAuthData, navigate]);
 
-  // função para enviar forms
-  const handleSubmitForm =  (e) => {
+  // Função para mudar os dados
+  const handleFormDataChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => {
+      const updatedForm = { ...prev, [name]: value };
+      console.log(updatedForm);
+      return updatedForm;
+    });
+  };
+
+  // Função para enviar o formulário
+  const handleSubmitForm = async (e) => {
+    e.preventDefault();
+
     if (!formData.fullname.trim()) {
-      setError("O nome é obrigatório.");
       return;
     }
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError("Insira um e-mail válido.");
       return;
     }
     if (formData.password !== formData.confirmPassword) {
-      setError("As senhas não combinam.");
       return;
     }
     if (formData.password && formData.password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres.");
       return;
     }
 
     try {
-      e.preventDefault()
-      console.log(formData)
-      console.log("ola")
-      signup(FormData)
-    } catch (error) {
-      setError("Falha ao cadastrar o usuário. Tente novamente.");
-      console.log(error)
+      const result = await signup(formData);
+      if (result.success) {
+        setFormData({ fullname: '', email: '', password: '', confirmPassword: '' });
+        setTimeout(() => navigate('/'), 2000);
+      }
+    } catch (err) {
+      console.error('Erro no cadastro:', err);
     }
   };
 
   return (
-    
     <div 
       className="cadastro-page" 
       style={{ backgroundImage: `url(${bgImage})` }}
@@ -65,24 +74,48 @@ function Cadastro() {
         </div>
         <h1>CADASTRO</h1>
         {error && <p className="error">{error}</p>}
+        {success && <p className="success">{success}</p>}
+        {authLoading && <p className="loading">Carregando...</p>}
         <form onSubmit={handleSubmitForm}>
-        <input type="email"
-                name="email" placeholder="Email"
-                onChange={handleFormDataChange} />
-        <input  type="fullname"
-                name="fullname" placeholder="User"
-                onChange={handleFormDataChange} />
-        <input type="password"
-                name="password" placeholder="Senha"
-                onChange={handleFormDataChange} />
-        <input type="password" name="confirmPassword" placeholder="Confirmar Senha"
-              onChange={handleFormDataChange} />
-        <button className="cadastro-button" type="submit" >Cadastrar</button>
+          <input
+            type="text"
+            name="fullname"
+            placeholder="Nome Completo"
+            value={formData.fullname}
+            onChange={handleFormDataChange}
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            value={formData.email}
+            onChange={handleFormDataChange}
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Senha"
+            value={formData.password}
+            onChange={handleFormDataChange}
+          />
+          <input
+            type="password"
+            name="confirmPassword"
+            placeholder="Confirmar Senha"
+            value={formData.confirmPassword}
+            onChange={handleFormDataChange}
+          />
+          <button
+            className="cadastro-button"
+            type="submit"
+            disabled={authLoading}
+          >
+            {authLoading ? 'Cadastrando...' : 'Cadastrar'}
+          </button>
         </form>
         <p className="login-link">
           Já tem uma conta? <Link to="/login">Entrar</Link>
         </p>
-
       </div>
     </div>
   );

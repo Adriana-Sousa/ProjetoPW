@@ -2,26 +2,26 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiHome, FiShoppingCart } from 'react-icons/fi';
 import bgImage from '../../assets/CARDAPIO.JPG';
-import api from '../../services/api';
 import './cardapio.css';
 import { useCarrinho } from '../../context/carrinhoContext';
 import platesServices from '../../services/plates';
-//import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { autenticado } from '../../context/authContext';
-import { adminRole } from '../../context/authContext';
+import { autenticado } from '../../context/auth_Context';
+import { adminRole } from '../../context/auth_Context';
 import { FiLogOut } from 'react-icons/fi';
 import authServices from '../../services/auth';
+import { useAuth } from '../../context/authContext';
 
 function Cardapio() {
-    const { logout } = authServices()
+    //const { logout } = authServices()
   const [pratos, setPratos] = useState([]);
   const [pratoSelecionado, setPratoSelecionado] = useState(null);
   const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
   const { carrinho, adicionarAoCarrinho } = useCarrinho();
+  const { isAuthenticated, logout } = useAuth();
 
   const navigate = useNavigate();
-    const { getPlates, updatePlate, deletePlate, platesLoading, platesList, refetchPlates, setRefetchPlates } = platesServices();
+    const { getPlates, updatePlate, deletePlate, platesLoading, platesList, refetchPlates, setRefetchPlates, getAvailablePlates } = platesServices();
     const [editingPlate, setEditingPlate] = useState(null);
     const [formData, setFormData] = useState({
       name: "",
@@ -37,14 +37,14 @@ function Cardapio() {
     const categories = ["Entradas", "Pratos Principais", "Sobremesas", "Bebidas"];
   
     useEffect(() => {
-      if (!autenticado) {
-        navigate("/auth");
+      if (!isAuthenticated) {
+        navigate("/");
       } else if (refetchPlates) {
-        getPlates();
+        getAvailablePlates();
         setPratos(platesList)
         
       }
-    }, [autenticado, adminRole, navigate, getPlates, refetchPlates]);
+    }, [isAuthenticated, navigate, getAvailablePlates, refetchPlates]);
 
   
 

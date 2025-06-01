@@ -18,7 +18,13 @@
   font-weight: bold;
   z-index: 9999;
 }
-
+.admin-icon {
+  color: var(--cor-texto);
+  transition: transform 0.3s ease, color 0.3s ease;
+  cursor: pointer;
+  color: black;
+  
+}
 .cardapio-navbar {
   position: fixed;
   top: 20px;

@@ -1,9 +1,10 @@
 import './cadastro.css';
-import bgImage from '../../assets/FOTOBASE.JPG';
+import bgImage from '../../assets/FOTOBASE.jpg';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiHome } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-import AuthServices from '../../services/auth';
+//import { useAuth } from '../../context/AuthContext'
+import { useAuth } from '../../context/authContext';
 
 function Cadastro() {
   const [formData, setFormData] = useState({
@@ -12,16 +13,15 @@ function Cadastro() {
     password: '',
     confirmPassword: ''
   });
-  const { signup, authLoading, error, success, getAuthData } = AuthServices();
+  const { signup, authLoading, error, success, isAuthenticated } = useAuth();
   const navigate = useNavigate();
 
-  // Verifica se o usuário já está logado
+  // Redireciona se já estiver logado
   useEffect(() => {
-    const authData = getAuthData();
-    if (authData) {
+    if (isAuthenticated) {
       navigate('/'); // Redireciona para a página inicial se já estiver logado
     }
-  }, [getAuthData, navigate]);
+  }, [isAuthenticated, navigate]);
 
   // Função para mudar os dados
   const handleFormDataChange = (e) => {

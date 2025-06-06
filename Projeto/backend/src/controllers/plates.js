@@ -52,17 +52,19 @@ export default class PlatesControllers {
   }
 
   async updatePlate(plateId, plateData) {
-    try {
-      const result = await this.dataAccess.updatePlate(plateId, plateData);
-      return ok(result);
-    } catch (error) {
-      if (error.message.includes('não encontrado')) {
-        return notFound(error.message);
-      }
-      if (error.message.includes('obrigatórios') || error.message.includes('inválida')) {
-        return badRequest(error.message);
-      }
-      return serverError(error.message);
+  try {
+    const result = await this.dataAccess.updatePlate(plateId, plateData);
+    console.log('Controlador: Prato atualizado:', result); // Log para depuração
+    return ok(result);
+  } catch (error) {
+    console.error('Controlador: Erro ao atualizar prato:', error.message); // Log para depuração
+    if (error.message.includes('não encontrado')) {
+      return notFound(error.message);
     }
+    if (error.message.includes('obrigatórios') || error.message.includes('inválida')) {
+      return badRequest(error.message);
+    }
+    return serverError(error.message);
   }
+}
 }

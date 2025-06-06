@@ -17,7 +17,7 @@ function Carrinho() {
 
   const continuarComprando = () => {
     setMostrarPopup(false);
-    navigate('/cardapio');
+    navigate('/cardapio-user');
   };
 
   const sair = () => {
@@ -28,7 +28,7 @@ function Carrinho() {
   return (
     <div className="carrinho-page">
       <header className="carrinho-header">
-        <Link to="/cardapio" className="carrinho-back">
+        <Link to="/cardapio-user" className="carrinho-back">
           <FiArrowLeft size={30} />
         </Link>
         <h1>Carrinho</h1>

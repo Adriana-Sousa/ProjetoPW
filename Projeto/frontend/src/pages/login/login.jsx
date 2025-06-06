@@ -3,23 +3,31 @@ import bgImage from '../../assets/FOTOBASE.JPG';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiHome, FiLock, FiKey } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/authContext';
+import { useAuth } from '../../hooks/useAuth';
 
 function Login() {
   const navigate = useNavigate();
-  const { login, authLoading, error, success, isAuthenticated } = useAuth();
+  const { login, user, authLoading, error, isAuthenticated, success, setSuccess } = useAuth();
+  
 
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
 
-  // Redireciona se já estiver logado
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/cardapio');
+      if (user?.role === 'admin') {
+        navigate('/admin');
+      } else {
+         navigate('/cardapio-user');
+        }
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, user, navigate]);
+
+  useEffect(() => {
+    if (success) setSuccess(null);
+  }, [success, setSuccess]);
 
   // Função para mudar os dados
   const handleFormDataChange = (e) => {
@@ -43,12 +51,9 @@ function Login() {
     }
 
     try {
-      const result = await login(formData);
+      await login(formData);
       console.log("aqui")
-      if (result.success) {
-        console.log("redirecionando")
-        navigate('/cardapio'); // Redireciona imediatamente após login bem-sucedido
-      }
+      // Navegação será tratada pelo useEffect quando isAuthenticated mudar
     } catch (err) {
       console.error('Erro no login:', err);
     }
@@ -67,7 +72,6 @@ function Login() {
         </div>
         <h1>LOGIN</h1>
         {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
         {authLoading && <p className="loading">Carregando...</p>}
         <form onSubmit={handleSubmitForm}>
           <div className="input-group">

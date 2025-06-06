@@ -3,8 +3,7 @@ import bgImage from '../../assets/FOTOBASE.jpg';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiHome } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
-//import { useAuth } from '../../context/AuthContext'
-import { useAuth } from '../../context/authContext';
+import { useAuth } from '../../hooks/useAuth';
 
 function Cadastro() {
   const [formData, setFormData] = useState({

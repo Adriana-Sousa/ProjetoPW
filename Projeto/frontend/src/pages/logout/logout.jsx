@@ -11,7 +11,7 @@ function Logout() {
       <div className="logout-container">
         <h2>Você realizou logout</h2>
         <Link to="/login">
-          <button className="logout-button">Fazer login de novo</button>
+          <button className="logout-button">Fazer login novamente</button>
         </Link>
         <Link to="/">
           <button className="logout-button">Ir para página inicial</button>

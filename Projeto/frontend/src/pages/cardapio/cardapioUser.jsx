@@ -16,13 +16,14 @@ function CardapioUsuario() {
   const { favoritos, toggleFavorito } = useFavoritos();
   const navigate = useNavigate();
   const { carrinho, adicionarAoCarrinho } = useCarrinho();
-  const { getAvailablePlates, platesList, platesLoading } = usePlatesServices();
+  const { getAvailablePlates, platesList, platesLoading, refetchPlates } = usePlatesServices();
   const { logout } = useAuth(); 
 
 
   useEffect(() => {
-    getAvailablePlates();
-  }, [getAvailablePlates]);
+    if(refetchPlates){
+    getAvailablePlates();}
+  }, [getAvailablePlates, refetchPlates]);
 
   const abrirModal = (prato) => setPratoSelecionado(prato);
   const fecharModal = () => setPratoSelecionado(null);

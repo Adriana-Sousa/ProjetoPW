@@ -51,8 +51,14 @@ platesRouter.delete('/:id', isAdmin, async (req, res) => {
 
 // PUT /plates/:id (protegido, admin)
 platesRouter.put('/:id', isAdmin, async (req, res) => {
-  const { body, success, statusCode } = await platesControllers.updatePlate(req.params.id, req.body);
-  res.status(statusCode).send({ body, success, statusCode });
+  try {
+    const { body, success, statusCode } = await platesControllers.updatePlate(req.params.id, req.body);
+    console.log('Roteador: Enviando resposta:', { body, success, statusCode }); // Log para depuração
+    res.status(statusCode).send({ body, success, statusCode });
+  } catch (error) {
+    console.error('Roteador: Erro inesperado:', error.message); // Log para depuração
+    res.status(500).send(serverError(error.message));
+  }
 });
 
 export default platesRouter;

@@ -44,9 +44,7 @@ export default class PlatesDataAccess {
     const result = await Mongo.db
       .collection(collectionName)
       .findOneAndDelete({ _id: new ObjectId(plateId) });
-    if (!result.value) {
-      throw new Error('Prato não encontrado');
-    }
+    
     return result.value;
   }
 
@@ -74,6 +72,7 @@ export default class PlatesDataAccess {
       imgUrl: imgUrl ?? '',
       category: category ?? '',
     };
+    console.log('Atualizando prato com ID:', plateId, 'Dados:', sanitizedData);
     const result = await Mongo.db
       .collection(collectionName)
       .findOneAndUpdate(
@@ -81,8 +80,15 @@ export default class PlatesDataAccess {
         { $set: sanitizedData },
         { returnDocument: 'after' }
       );
+    console.log('Resultado do MongoDB:', result);
     if (!result.value) {
-      throw new Error('Prato não encontrado');
+      // Verificar se o documento existe
+      const existing = await Mongo.db.collection(collectionName).findOne({ _id: new ObjectId(plateId) });
+      if (!existing) {
+        throw new Error('Prato não encontrado');
+      }
+      console.log('Documento existente retornado:', existing);
+      return existing; // Retorna o documento existente se não houve alterações
     }
     return result.value;
   }

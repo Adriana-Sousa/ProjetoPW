@@ -108,40 +108,46 @@ export default function PlatesServices() {
   };
 
   // Atualizar um prato existente
-  const updatePlate = async (plateId, formData) => {
-    if (!plateId || !formData.name || !formData.price || formData.price <= 0) {
-      return { success: false, message: 'ID, nome e preço válido são obrigatórios' };
+ const updatePlate = async (plateId, formData) => {
+  if (!plateId || !formData.name || !formData.price || formData.price <= 0) {
+    return { success: false, message: 'ID, nome e preço válido são obrigatórios' };
+  }
+  if (formData.ingredients && !Array.isArray(formData.ingredients)) {
+    return { success: false, message: 'Ingredientes devem ser uma lista' };
+  }
+  if (formData.category && !['entrada', 'principal', 'sobremesa', 'bebida'].includes(formData.category)) {
+    return { success: false, message: 'Categoria inválida' };
+  }
+  setPlatesLoading(true);
+  try {
+    console.log('Enviando atualização para prato:', { plateId, formData }); // Log para depuração
+    const response = await fetch(`${baseUrl}/${plateId}`, {
+      method: 'PUT',
+      headers: {
+        ...getHeaders(),
+        'Cache-Control': 'no-cache', // Evita cache
+      },
+      body: JSON.stringify(formData),
+    });
+    const result = await response.json();
+    console.log('Resposta do backend:', { status: response.status, result }); // Log para depuração
+    if (response.ok && result.success) {
+      setRefetchPlates(true);
+      return { success: true, data: result.body };
+    } else {
+      return {
+        success: false,
+        message: result.body?.message || `Erro ao atualizar prato (Status: ${response.status})`,
+        status: response.status,
+      };
     }
-    if (formData.ingredients && !Array.isArray(formData.ingredients)) {
-      return { success: false, message: 'Ingredientes devem ser uma lista' };
-    }
-    if (formData.category && !['entrada', 'principal', 'sobremesa', 'bebida'].includes(formData.category)) {
-      return { success: false, message: 'Categoria inválida' };
-    }
-    setPlatesLoading(true);
-    try {
-      const response = await fetch(`${baseUrl}/${plateId}`, {
-        method: 'PUT',
-        headers: getHeaders(),
-        body: JSON.stringify(formData),
-      });
-      const result = await response.json();
-      if (response.ok && result.success) {
-        setRefetchPlates(true);
-        return { success: true, data: result.body };
-      } else {
-        return {
-          success: false,
-          message: result.body?.message || 'Erro ao atualizar prato',
-          status: response.status,
-        };
-      }
-    } catch (error) {
-      return { success: false, message: error.message, status: 500 };
-    } finally {
-      setPlatesLoading(false);
-    }
-  };
+  } catch (error) {
+    console.error('Erro de rede:', error);
+    return { success: false, message: 'Erro de conexão com o servidor', status: 500 };
+  } finally {
+    setPlatesLoading(false);
+  }
+};
 
   // Excluir um prato
   const deletePlate = async (plateId) => {

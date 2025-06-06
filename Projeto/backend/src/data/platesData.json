@@ -36,4 +36,32 @@
         "imgUrl": "/imgs/plates/strogonoff.jpg",
         "category": "Principal"
     },
+
+    {
+        "name": "Feijoada",
+        "price": 15.99,
+        "available": true,
+        "description": "Tradicional feijoada brasileira com feijão preto, carnes variadas e acompanhamentos que trazem o sabor autêntico do Brasil!",
+        "ingredients": ["Feijão preto", "Carnes variadas", "Laranja", "Couve", "Farinha"],
+        "imgUrl": "/imgs/plates/prato1.png",
+        "category": "Principal"
+    },
+    {
+        "name": "Carne com Batata Frita",
+        "price": 12.50,
+        "available": true,
+        "description": "Uma suculenta carne acompanhada de batatas fritas crocantes, perfeitas para uma refeição rápida e saborosa!",
+        "ingredients": ["Carne bovina", "Batata frita", "Sal"],
+        "imgUrl": "/imgs/plates/prato3.png",
+        "category": "Principal"
+    },
+    {
+        "name": "Pão Integral",
+        "price": 2.99,
+        "available": true,
+        "description": "Pão integral fresco, preparado com grãos integrais, ideal para um café da manhã saudável ou acompanhamento leve!",
+        "ingredients": ["Farinha integral", "Fermento", "Água", "Sal"],
+        "imgUrl": "/imgs/plates/prato6.png",
+        "category": "Acompanhamento"
+    }
 ]

@@ -1,5 +1,7 @@
+// src/services/usePlatesServices.js
 import { useState } from 'react';
-import { useAuth } from '../context/authContext';
+//import { useAuth } from '../context/authContext';
+import { useAuth } from '../hooks/useAuth';
 
 export default function PlatesServices() {
   const [platesLoading, setPlatesLoading] = useState(false);

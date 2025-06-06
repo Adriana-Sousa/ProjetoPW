@@ -377,6 +377,10 @@
   font-size: 1rem;
 }
 
+.modal-input-category {
+  color: black;
+}
+
 .modal-textarea {
   min-height: 100px;
   resize: vertical;

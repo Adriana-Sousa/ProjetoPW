@@ -4,8 +4,8 @@ import Navbar from '../navbar/navbar';
 const Layout = ({ children }) => {
   const location = useLocation();
   
-  // Rotas que NÃO devem exibir a Navbar
-  const noNavbarRoutes = ['/', '/login', '/cadastro', '/admin', '/loginadm', '/cardapio', '/cart'];
+  // rotas sem navbar
+  const noNavbarRoutes = ['/', '/login', '/cadastro', '/admin', '/loginadm', '/cardapio-user', '/cart', '/cardapio-publico', '/cardapio-admin', '/user-page', '/logout'];
 
   const shouldShowNavbar = !noNavbarRoutes.includes(location.pathname);
 

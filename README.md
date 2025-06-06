@@ -2,7 +2,7 @@
 
 ## Descrição
 
-Bem-vindo ao It's Tasty, um projeto de cardápio online que oferece uma experiência interativa para explorar pratos e sobremesas deliciosas, como Feijoada, Carne com Batata Frita, Pão Integral, Mousse de Maracujá, Carne de Sol na Nata, Strogonoff de Carne de Sol e Cupcake de Milho com Coco. Este projeto combina um backend robusto com autenticação segura e um frontend dinâmico para gerenciar e exibir o cardápio de forma eficiente.
+Bem-vindo ao It's Tasty, um projeto de cardápio online que oferece uma experiência interativa para explorar pratos e sobremesas. Este projeto combina um backend robusto com autenticação segura e um frontend dinâmico para gerenciar e exibir o cardápio de forma eficiente.
 
 ## Estrutura do Projeto
 

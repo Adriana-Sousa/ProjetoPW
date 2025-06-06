@@ -1,3 +1,39 @@
 [
-    
+    {
+        "name": "Cupcake de Milho com Coco",
+        "price": 4.99,
+        "available": true,
+        "description": "Delicioso cupcake feito com farinha de milho e coco ralado, com uma textura macia e um sabor doce e tropical que encanta!",
+        "ingredients": ["Farinha de milho", "Coco ralado", "Açúcar", "Ovos", "Leite de coco"],
+        "imgUrl": "/imgs/plates/doce.JPG",
+        "category": "Sobremesa"
+    },
+
+    {
+        "name": "Mousse de Maracujá",
+        "price": 6.99,
+        "available": true,
+        "description": "Uma sobremesa leve e refrescante feita com suco natural de maracujá, perfeita para fechar a refeição com um toque tropical!",
+        "ingredients": ["Suco de maracujá", "Leite condensado", "Creme de leite"],
+        "imgUrl": "/imgs/plates/mousse.jpg",
+        "category": "Sobremesa"
+    },
+    {
+        "name": "Carne de Sol na Nata",
+        "price": 18.50,
+        "available": true,
+        "description": "Carne de sol suculenta servida com um cremoso molho de nata, acompanhada de sabores regionais que encantam o paladar!",
+        "ingredients": ["Carne de sol", "Nata", "Cebola", "Manteiga"],
+        "imgUrl": "/imgs/plates/carne_sol.jpg",
+        "category": "Principal"
+    },
+    {
+        "name": "Strogonoff de Carne de Sol",
+        "price": 16.99,
+        "available": true,
+        "description": "Clássico strogonoff com um toque nordestino, preparado com carne de sol desfiada e um molho cremoso irresistível!",
+        "ingredients": ["Carne de sol", "Creme de leite", "Molho de tomate", "Cebola", "Pimentão"],
+        "imgUrl": "/imgs/plates/strogonoff.jpg",
+        "category": "Principal"
+    },
 ]

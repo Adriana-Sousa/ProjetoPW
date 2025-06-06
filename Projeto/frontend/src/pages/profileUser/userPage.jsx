@@ -1,5 +1,5 @@
 import './userPage.css';
-import bgImage from '../../assets/FOTOBASE.jpg';
+import bgImage from '../../assets/FOTOBASE.JPG';
 import { Link } from 'react-router-dom';
 import { FiHome, FiShoppingCart, FiLogOut } from 'react-icons/fi';
 import { MdRestaurantMenu } from 'react-icons/md';
@@ -7,17 +7,24 @@ import { useCarrinho } from '../../context/carrinhoContext';
 import { useFavoritos } from '../../hooks/useFavoritos';
 import { useAuth } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 function UserPage() {
   const { logout, user } = useAuth();
   const { carrinho } = useCarrinho();
  const { favoritos, removerFavorito } = useFavoritos();
   const [ultimasEscolhas, setUltimasEscolhas] = useState([]);
+  const navigate = useNavigate();
 
  useEffect(() => {
     const ultimos = [...carrinho].slice(-3).reverse();
     setUltimasEscolhas(ultimos);
   }, [carrinho]);
+
+  const handleLogout = () => {
+    logout();
+    navigate('/logout');
+  };
 
   return (
     <div className="user-page" style={{ backgroundImage: `url(${bgImage})` }}>
@@ -31,7 +38,7 @@ function UserPage() {
         <Link to="/cardapio-user" className="admin-icon-link" title="Cardápio">
             <MdRestaurantMenu size={20} />
         </Link>
-        <button className="admin-icon-link" title="Sair" onClick={logout}>
+        <button className="admin-icon-link" title="Sair" onClick={handleLogout}>
           <FiLogOut size={20} />
         </button>
       </div>

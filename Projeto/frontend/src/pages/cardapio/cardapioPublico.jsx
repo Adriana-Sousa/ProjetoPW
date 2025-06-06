@@ -1,17 +1,19 @@
+// src/pages/cardapio/cardapioPublico.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiHome } from 'react-icons/fi';
 import bgImage from '../../assets/CARDAPIO.JPG';
 import './cardapio.css';
-import usePlatesServices from '../../services/plates';
+import PlatesServices from '../../services/plates';
 
 function CardapioPublico() {
   const [pratoSelecionado, setPratoSelecionado] = useState(null);
   const navigate = useNavigate();
-  const { getAvailablePlates, platesList, platesLoading, refetchPlates } = usePlatesServices();
+  const { getAvailablePlates, platesList, platesLoading, refetchPlates } = PlatesServices();
 
   useEffect(() => {
-    getAvailablePlates();
+    if(refetchPlates){
+    getAvailablePlates();}
   }, [getAvailablePlates, refetchPlates]);
 
   const abrirModal = (prato) => {

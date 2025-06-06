@@ -3,8 +3,9 @@ import './home.css';
 import bgImage from '../../assets/HOME.jpg';
 import { useAuth } from '../../hooks/useAuth';
 import AdminPage from '../admin/admin';
-import Cardapio from '../cardapio/cardapioUser';
+//import Cardapio from '../cardapio/cardapioUser';
 import { useEffect, useState } from 'react';
+import CardapioUsuario from '../cardapio/cardapioUser';
 
 function Home() {
   const { isAuthenticated, user, success, setSuccess} = useAuth();
@@ -27,7 +28,7 @@ function Home() {
         user?.role === 'admin' ? (
           <AdminPage />
         ) : (
-          <Cardapio />
+          <CardapioUsuario />
         )
       ) : (
         <div

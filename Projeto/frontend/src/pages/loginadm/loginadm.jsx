@@ -2,17 +2,21 @@ import './loginadm.css';
 import bgImage from '../../assets/FOTOBASE.JPG';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiHome, FiLock, FiKey } from 'react-icons/fi';
-import { useState, useEffect } from 'react';
-import { useAuth } from '../../context/authContext';
+import { useState, useEffect} from 'react';
+import { useAuth } from '../../hooks/useAuth';
 
 function LoginAdm() {
   const navigate = useNavigate();
-  const { login, authLoading, error, success, isAuthenticated, user } = useAuth();
+  const { login, authLoading, error, success, isAuthenticated, user, setSuccess } = useAuth();
 
   const [formData, setFormData] = useState({
     email: '',
     password: ''
   });
+
+  useEffect(() => {
+    if (success) setSuccess(null);
+  }, [success, setSuccess]);
 
   // Redireciona com base no estado de autenticação
   useEffect(() => {
@@ -71,7 +75,7 @@ function LoginAdm() {
             <FiHome size={20} color="white" />
           </Link>
         </div>
-        <h1>OLÁ ADMINISTRADOR</h1>
+        <h1>OLÁ, ADMINISTRADOR</h1>
         {error && <p className="error">{error}</p>}
         {success && <p className="success">{success}</p>}
         {authLoading && <p className="loading">Carregando...</p>}

@@ -24,14 +24,14 @@ function App() {
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/logout" element={<Logout />} />
-      <Route path="/cart" element={<Carrinho />} />
-      <Route path="/cardapio-user" element={<CardapioUsuario />} />
+      <Route path="/cart" element={<ProtectedRoute allowedRole="client"><Carrinho /></ProtectedRoute>} />
+      <Route path="/cardapio-user" element={<ProtectedRoute allowedRole="client"><CardapioUsuario /></ProtectedRoute>} />
       <Route path="/cardapio-publico" element={<CardapioPublico />} />
       <Route path="/cardapio-admin" element={<ProtectedRoute allowedRole="admin"><CardapioAdmin /></ProtectedRoute>} />
       <Route path="/login" element={<Login/>}/>
       <Route path="/cadastro" element={<Cadastro/>}/>
       <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Admin /></ProtectedRoute>} />
-      <Route path="/user-page" element={<ProtectedRoute><UserPage /></ProtectedRoute>} />
+      <Route path="/user-page" element={<ProtectedRoute allowedRole="client"><UserPage /></ProtectedRoute>} />
       <Route path="/loginadm" element={<LoginAdm/>}/>
       <Route path="/sem-autorizacao" element={<Unauthorized />} />
       <Route path="/*" element={<Notfound />} />

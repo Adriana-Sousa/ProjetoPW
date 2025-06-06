@@ -1,19 +1,17 @@
-// src/pages/cardapio/cardapioPublico.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiHome } from 'react-icons/fi';
 import bgImage from '../../assets/CARDAPIO.JPG';
 import './cardapio.css';
-import PlatesServices from '../../services/plates';
+import usePlatesServices from '../../services/plates';
 
 function CardapioPublico() {
   const [pratoSelecionado, setPratoSelecionado] = useState(null);
   const navigate = useNavigate();
-  const { getAvailablePlates, platesList, platesLoading, refetchPlates } = PlatesServices();
+  const { getAvailablePlates, platesList, platesLoading, refetchPlates } = usePlatesServices();
 
   useEffect(() => {
-    if(refetchPlates){
-    getAvailablePlates();}
+    getAvailablePlates();
   }, [getAvailablePlates, refetchPlates]);
 
   const abrirModal = (prato) => {
@@ -27,11 +25,12 @@ function CardapioPublico() {
   return (
     <div className="cardapio-page" style={{ backgroundImage: `url(${bgImage})` }}>
       <nav className="cardapio-navbar">
-        <h1 className="cardapio-title">Cardápio</h1>
+        
         <Link to="/" className="nav-icon">
           <FiHome size={24} />
         </Link>
       </nav>
+      <h1 className="cardapio-title">Cardápio</h1>
 
       {platesLoading && <p className="loading">Carregando pratos...</p>}
       {!platesLoading && platesList.length === 0 && <p className="no-plates">Nenhum prato disponível no momento.</p>}
@@ -51,7 +50,7 @@ function CardapioPublico() {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <h2>{pratoSelecionado.name}</h2>
             <img src={pratoSelecionado.imgUrl || 'https://via.placeholder.com/150'} alt={pratoSelecionado.name} />
-            <p style={{ marginBottom: '1rem' }}>Para adicionar ao carrinho, entre na sua conta.</p>
+            <p style={{ marginBottom: '1rem' }}>Para mais informações e/ou ações, entre na sua conta.</p>
             <div className="modal-buttons">
               <button className="modal-button" onClick={() => navigate('/login')}>Entrar</button>
               <button className="modal-button-outline" onClick={() => navigate('/cadastro')}>Cadastrar-se</button>

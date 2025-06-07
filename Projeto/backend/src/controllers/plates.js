@@ -39,8 +39,11 @@ export default class PlatesControllers {
   async deletePlate(plateId) {
     try {
       const result = await this.dataAccess.deletePlate(plateId);
+      console.log('Controlador: Prato excluído:', result);
       return ok(result);
     } catch (error) {
+      
+      console.error('Controlador: Erro ao excluir prato:', error.message);
       if (error.message.includes('não encontrado')) {
         return notFound(error.message);
       }

@@ -50,6 +50,7 @@
   padding: 6px;
   border-radius: 6px;
   border: 1px solid transparent;
+  color: black;
 }
 
 .nav-icon:hover {

@@ -1,29 +1,10 @@
 // src/routes/platesRouter.js
 import express from 'express';
 import PlatesControllers from '../controllers/plates.js';
-import jwt from 'jsonwebtoken';
-import { unauthorized, forbidden } from '../helpers/httpResponses.js';
+import { isAdmin } from '../middleware/authMiddleware.js';
 
 const platesRouter = express.Router();
 const platesControllers = new PlatesControllers();
-
-// Middleware para verificar admin
-const isAdmin = (req, res, next) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) {
-    return res.status(401).send(unauthorized('Token ausente'));
-  }
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
-    if (decoded.role !== 'admin') {
-      return res.status(403).send(forbidden('Acesso restrito a administradores'));
-    }
-    req.user = decoded;
-    next();
-  } catch (error) {
-    return res.status(401).send(unauthorized('Token inválido'));
-  }
-};
 
 // GET /plates/availables (público)
 platesRouter.get('/availables', async (req, res) => {
@@ -45,8 +26,14 @@ platesRouter.post('/', isAdmin, async (req, res) => {
 
 // DELETE /plates/:id (protegido, admin)
 platesRouter.delete('/:id', isAdmin, async (req, res) => {
-  const { body, success, statusCode } = await platesControllers.deletePlate(req.params.id);
-  res.status(statusCode).send({ body, success, statusCode });
+  try {
+    const { body, success, statusCode } = await platesControllers.deletePlate(req.params.id);
+    console.log('Roteador: Enviando resposta:', { body, success, statusCode });
+    res.status(statusCode).send({ body, success, statusCode });
+  } catch (error) {
+    console.error('Roteador: Erro inesperado:', error.message);
+    res.status(500).send(serverError(error.message));
+  }
 });
 
 // PUT /plates/:id (protegido, admin)

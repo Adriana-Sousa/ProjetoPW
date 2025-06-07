@@ -41,11 +41,24 @@ export default class PlatesDataAccess {
     if (!ObjectId.isValid(plateId)) {
       throw new Error('ID inválido');
     }
+
+    // verificar se o documento existe
+    const existing = await Mongo.db.collection(collectionName).findOne({ _id: new ObjectId(plateId) });
+
+    console.log('Excluindo prato com ID:', plateId);
     const result = await Mongo.db
       .collection(collectionName)
       .findOneAndDelete({ _id: new ObjectId(plateId) });
+    console.log('Resultado do MongoDB:', result);
     
-    return result.value;
+    if (!result.value) {
+
+      // Verificar se o documento existia
+      if (!existing) {
+        throw new Error('Prato não encontrado');
+      }
+    }
+    return result.value || { _id: plateId, message: 'Prato excluído com sucesso' };
   }
 
   // Editar pratos

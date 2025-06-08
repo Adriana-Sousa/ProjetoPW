@@ -49,14 +49,14 @@ function CardapioUsuario() {
         className="search-input"
       />
       <div className="nav-actions">
-          <Link to="/" className="nav-icon">
+          <Link to="/" className="nav-icon-user">
             <FiHome size={24} />
           </Link>
-          <Link to="/user-page" className="nav-icon">
+          <Link to="/user-page" className="nav-icon-user">
             <FiUser size={24} />
           </Link>
           <div className={`carrinho-container ${mostrarCarrinho ? 'ativo' : ''}`}>
-            <FiShoppingCart size={24} className="nav-icon" onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
+            <FiShoppingCart size={24} className="nav-icon-user" onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
             {carrinho.length > 0 && <span className="carrinho-count">{carrinho.length}</span>}
           </div>
           {/* Botão de logout */}

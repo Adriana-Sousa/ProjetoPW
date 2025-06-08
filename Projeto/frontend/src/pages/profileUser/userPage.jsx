@@ -45,7 +45,7 @@ function UserPage() {
 
       <div className="admin-content">
         <div className="admin-header">
-          <h1>Olá, {user?.name || 'Usuário'}</h1>
+          <h1>Olá, {user?.fullname || 'Usuário'}</h1>
         </div>
 
         <div className="admin-section">

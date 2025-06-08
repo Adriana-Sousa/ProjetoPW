@@ -1,42 +1,60 @@
-import express from 'express'
-import OrdersControllers from '../controllers/orders.js'
+import express from 'express';
+import OrdersControllers from '../controllers/orders.js';
+//import { isAdmin } from '../middleware/authMiddleware.js';
+import { serverError } from '../helpers/httpResponses.js';
+import { isAdmin } from '../middleware/authMiddleware.js';
 
-const ordersRouter = express.Router()
-const ordersControllers = new OrdersControllers()
+const ordersRouter = express.Router();
+const ordersControllers = new OrdersControllers();
 
-// pegar todas as ordens
-ordersRouter.get('/', async (req, res) => {
-    const { body, success, statusCode } = await ordersControllers.getOrders()
+//pegar todas as ordens
+ordersRouter.get('/',  isAdmin, async (req, res) => {
+  try {
+    const { body, success, statusCode } = await ordersControllers.getOrders();
+    res.status(statusCode).send({ body, success, statusCode });
+  } catch (error) {
+    res.status(500).send(serverError(error.message));
+  }
+});
 
-    res.status(statusCode).send({ body, success, statusCode })
-})
+ordersRouter.get('/user/:userId', async (req, res) => {
+  try {
+    const { body, success, statusCode } = await ordersControllers.getOrdersByUserId(req.params.userId);
+    res.status(statusCode).send({ body, success, statusCode });
+  } catch (error) {
+    res.status(500).send(serverError(error.message));
+  }
+});
 
-// pegar as ordens por user
-ordersRouter.get('/userorders/:id', async (req, res) => {
-    const { body, success, statusCode } = await ordersControllers.getOrdersByUserId(req.params.id)
-
-    res.status(statusCode).send({ body, success, statusCode })
-})
-
-// adicionar ordem
 ordersRouter.post('/', async (req, res) => {
-    const { body, success, statusCode } = await ordersControllers.addOrder(req.body)
+  try {
+    const { body, success, statusCode } = await ordersControllers.addOrder(req.body);
+    res.status(statusCode).send({ body, success, statusCode });
+  } catch (error) {
+    res.status(500).send(serverError(error.message));
+  }
+});
 
-    res.status(statusCode).send({ body, success, statusCode })
-})
+ordersRouter.delete('/:id', isAdmin, async (req, res) => {
+  try {
+    const { body, success, statusCode } = await ordersControllers.deleteOrder(req.params.id);
+    console.log('Roteador: Enviando resposta:', { body, success, statusCode });
+    res.status(statusCode).send({ body, success, statusCode });
+  } catch (error) {
+    console.error('Roteador: Erro inesperado:', error.message);
+    res.status(500).send(serverError(error.message));
+  }
+});
 
-// deletar ordem
-ordersRouter.delete('/:id', async (req, res) => {
-    const { body, success, statusCode } = await ordersControllers.deleteOrder(req.params.id)
+ordersRouter.put('/:id', isAdmin, async (req, res) => {
+  try {
+    const { body, success, statusCode } = await ordersControllers.updateOrder(req.params.id, req.body);
+    console.log('Roteador: Enviando resposta:', { body, success, statusCode });
+    res.status(statusCode).send({ body, success, statusCode });
+  } catch (error) {
+    console.error('Roteador: Erro inesperado:', error.message);
+    res.status(500).send(serverError(error.message));
+  }
+});
 
-    res.status(statusCode).send({ body, success, statusCode })
-})
-
-// editar ordem
-ordersRouter.put('/:id', async (req, res) => {
-    const { body, success, statusCode } = await ordersControllers.updateOrder(req.params.id, req.body)
-
-    res.status(statusCode).send({ body, success, statusCode })
-})
-
-export default ordersRouter 
+export default ordersRouter;

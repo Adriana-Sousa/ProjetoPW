@@ -1,192 +1,256 @@
-import { Mongo } from "../database/mongo.js"
-import { ObjectId } from 'mongodb'
+// src/dataAccess/OrdersDataAccess.js
+import { Mongo } from "../database/mongo.js";
+import { ObjectId } from 'mongodb';
 
-const collectionName = 'orders'
+const collectionName = 'orders';
 
 export default class OrdersDataAccess {
-
-    // pegar todas as ordens
-    async getOrders() {
-        const result = await Mongo.db
+  // Pegar todas as ordens
+  async getOrders() {
+    try {
+      console.log('Buscando todas as ordens');
+      const result = await Mongo.db
         .collection(collectionName)
         .aggregate([
-            {
-                // olhar para
-                $lookup: {
-                    from: 'orderItems', // onde olhar
-                    localField: '_id', // local de refência
-                    foreignField: 'orderId', // campo estrangeiro
-                    as: 'orderItems' // como o campo vai se chamar
-                }
+          {
+            $lookup: {
+              from: 'orderItems',
+              localField: '_id',
+              foreignField: 'orderId',
+              as: 'orderItems',
             },
-            {
-                // ver quem foi o user que fez o pedido
-                $lookup: {
-                    from: 'users', // onde olhar
-                    localField: 'userId', // local de referência
-                    foreignField: '_id', // campo estrangeiro
-                    as: 'userDetails' // como o campo vai se chamar
-                }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'userId',
+              foreignField: '_id',
+              as: 'userDetails',
             },
-            {
-                // não mostrar os campos sensiveis dos users
-                $project: {
-                    'userDetails.password': 0,
-                    'userDetails.salt': 0,
-                }
+          },
+          {
+            $project: {
+              'userDetails.password': 0,
+              'userDetails.salt': 0,
             },
-            {
-                // mudar o camando para outra coleção
-                $unwind: '$orderItems'
+          },
+          {
+            $unwind: {
+              path: '$orderItems',
+              preserveNullAndEmptyArrays: true, // Mantém ordens sem itens
             },
-            {
-                // ver os pratos do pedido
-                $lookup: {
-                    from: 'plates', // onde olhar
-                    localField: 'orderItems.plateId', // local de referência
-                    foreignField: '_id', // campo estrangeiro
-                    as: 'orderItems.itemDetails' // comoo vai se chamar
-                }
+          },
+          {
+            $lookup: {
+              from: 'plates',
+              localField: 'orderItems.plateId',
+              foreignField: '_id',
+              as: 'orderItems.itemDetails',
             },
-            {
-                // agrupar os itens que tem o mesmo id
-                $group: {
-                    _id: '$_id',
-                    userDetails: { $first: '$userDetails' },
-                    orderItems: { $push: '$orderItems' },
-                    pickupStatus: { $first: '$pickupStatus' },
-                    pickupTime: { $first: '$pickupTime' },
-                    pickupDate: { $first: '$pickupDate' },
-                }
-            }
+          },
+          {
+            $group: {
+              _id: '$_id',
+              userDetails: { $first: '$userDetails' },
+              orderItems: { $push: '$orderItems' },
+              pickupStatus: { $first: '$pickupStatus' },
+              pickupTime: { $first: '$pickupTime' },
+              pickupDate: { $first: '$pickupDate' },
+              createdAt: { $first: '$createdAt' },
+            },
+          },
         ])
-        .toArray()
-
-        return result
+        .toArray();
+      console.log('Ordens encontradas:', result.length);
+      return result;
+    } catch (error) {
+      console.error('Erro ao buscar ordens:', error.message);
+      throw new Error('Erro ao buscar ordens');
     }
+  }
 
-    // pegar os pedidos pelo id do user
-    async getOrdersByUserId(userId) {
-        const result = await Mongo.db
+  // Pegar ordens pelo ID do usuário
+  async getOrdersByUserId(userId) {
+    if (!ObjectId.isValid(userId)) {
+      throw new Error('ID de usuário inválido');
+    }
+    try {
+      console.log('Buscando ordens para userId:', userId);
+      const result = await Mongo.db
         .collection(collectionName)
         .aggregate([
-            {
-                // verificar o id do user
-                $match: { userId: new ObjectId(userId) }
-            }, 
-            {
-                // ver os itens de pedido
-                $lookup: {
-                    from: 'orderItems',
-                    localField: '_id',
-                    foreignField: 'orderId',
-                    as: 'orderItems'
-                }
+          {
+            $match: { userId: new ObjectId(userId) },
+          },
+          {
+            $lookup: {
+              from: 'orderItems',
+              localField: '_id',
+              foreignField: 'orderId',
+              as: 'orderItems',
             },
-            {
-                // ver os usuarios
-                $lookup: {
-                    from: 'users',
-                    localField: 'userId',
-                    foreignField: '_id',
-                    as: 'userDetails'
-                }
+          },
+          {
+            $lookup: {
+              from: 'users',
+              localField: 'userId',
+              foreignField: '_id',
+              as: 'userDetails',
             },
-            {
-                $project: {
-                    'userDetails.password': 0,
-                    'userDetails.salt': 0,
-                }
+          },
+          {
+            $project: {
+              'userDetails.password': 0,
+              'userDetails.salt': 0,
             },
-            {
-                $unwind: '$orderItems'
+          },
+          {
+            $unwind: {
+              path: '$orderItems',
+              preserveNullAndEmptyArrays: true,
             },
-            {
-                // ver os pratos
-                $lookup: {
-                    from: 'plates',
-                    localField: 'orderItems.plateId',
-                    foreignField: '_id',
-                    as: 'orderItems.itemDetails'
-                }
+          },
+          {
+            $lookup: {
+              from: 'plates',
+              localField: 'orderItems.plateId',
+              foreignField: '_id',
+              as: 'orderItems.itemDetails',
             },
-            {
-                $group: {
-                    _id: '$_id',
-                    userDetails: { $first: '$userDetails' },
-                    orderItems: { $push: '$orderItems' },
-                    pickupStatus: { $first: '$pickupStatus' },
-                    pickupTime: { $first: '$pickupTime' }
-                }
-            }
+          },
+          {
+            $group: {
+              _id: '$_id',
+              userDetails: { $first: '$userDetails' },
+              orderItems: { $push: '$orderItems' },
+              pickupStatus: { $first: '$pickupStatus' },
+              pickupTime: { $first: '$pickupTime' },
+              pickupDate: { $first: '$pickupDate' },
+              createdAt: { $first: '$createdAt' },
+            },
+          },
         ])
-        .toArray()
-
-        return result
+        .toArray();
+      console.log('Ordens encontradas para userId:', result.length);
+      return result;
+    } catch (error) {
+      console.error('Erro ao buscar ordens por userId:', error.message);
+      throw new Error('Erro ao buscar ordens por usuário');
     }
+  }
 
-    // adicionar ordens
-    async addOrder(orderData) {
-        const { items, ...orderDataRest } = orderData
+  // Adicionar ordem
+  async addOrder(orderData) {
+    if (!orderData.userId || !orderData.items || !Array.isArray(orderData.items) || orderData.items.length === 0) {
+      throw new Error('Dados da ordem inválidos: userId e itens são obrigatórios');
+    }
+    const { items, ...orderDataRest } = orderData;
 
-        // adicionar a data que a ordem foi criada
-        orderDataRest.createdAt = new Date()
-        orderDataRest.pickupStatus = 'Pending' // estado da ordem
-        orderDataRest.userId = new ObjectId(orderDataRest.userId) // referência pro user
+    try {
+      console.log('Adicionando ordem para userId:', orderDataRest.userId);
+      orderDataRest.createdAt = new Date();
+      orderDataRest.pickupStatus = 'Pending';
+      orderDataRest.userId = new ObjectId(orderDataRest.userId);
 
-        // inserir ordem
-        const newOrder = await Mongo.db
+      const newOrder = await Mongo.db
         .collection(collectionName)
-        .insertOne(orderDataRest)
+        .insertOne(orderDataRest);
 
-        // se não recebeu o id
-        if(!newOrder.insertedId) {
-            throw new Error('Order cannot be inserted')
-        }
+      if (!newOrder.insertedId) {
+        throw new Error('Não foi possível inserir a ordem');
+      }
 
-        // trabalhar com cada item de forma individual
-        items.map((item) => {
-            item.plateId = new ObjectId(item.plateId)
-            item.orderId = new ObjectId(newOrder.insertedId)
-        })
+      const preparedItems = items.map((item) => ({
+        ...item,
+        plateId: new ObjectId(item.plateId),
+        orderId: new ObjectId(newOrder.insertedId),
+      }));
 
-        const result = await Mongo.db
+      const result = await Mongo.db
         .collection('orderItems')
-        .insertMany(items)
+        .insertMany(preparedItems);
 
-        return result
+      console.log('Ordem adicionada, ID:', newOrder.insertedId, 'Itens:', result.insertedCount);
+      return {
+        orderId: newOrder.insertedId,
+        insertedItems: result.insertedCount,
+      };
+    } catch (error) {
+      console.error('Erro ao adicionar ordem:', error.message);
+      throw new Error(`Erro ao adicionar ordem: ${error.message}`);
     }
+  }
 
-    // eliminar ordens
-    async deleteOrder (orderId) {
-
-        // eliminar os itens da ordem
-        const itemsToDelete = await Mongo.db
+  // Eliminar ordem
+  async deleteOrder(orderId) {
+    if (!ObjectId.isValid(orderId)) {
+      throw new Error('ID de ordem inválido');
+    }
+    try {
+      console.log('Excluindo ordem com ID:', orderId);
+      // Excluir itens da ordem
+      const itemsResult = await Mongo.db
         .collection('orderItems')
-        .deleteMany({ orderId: new ObjectId(orderId) })
+        .deleteMany({ orderId: new ObjectId(orderId) });
 
-        // eliminar a ordem
-        const orderToDelete = await Mongo.db
+      // Excluir a ordem
+      const orderResult = await Mongo.db
         .collection(collectionName)
-        .findOneAndDelete({ _id: new ObjectId(orderId) })
+        .findOneAndDelete({ _id: new ObjectId(orderId) });
 
-        const result = {
-            itemsToDelete,
-            orderToDelete
+      console.log('Resultado da exclusão:', { itemsDeleted: itemsResult.deletedCount, orderResult });
+
+      // Verificar se a ordem existia
+      if (!orderResult.value) {
+        const existing = await Mongo.db.collection(collectionName).findOne({ _id: new ObjectId(orderId) });
+        if (!existing) {
+          throw new Error('Ordem não encontrada');
         }
+      }
 
-        return result
+      return {
+        itemsDeleted: itemsResult.deletedCount,
+        order: orderResult.value || { _id: orderId, message: 'Ordem excluída com sucesso' },
+      };
+    } catch (error) {
+      console.error('Erro ao excluir ordem:', error.message);
+      throw new Error(`Erro ao excluir ordem: ${error.message}`);
     }
+  }
 
-    async updateOrder(orderId, orderData) {
-        const result = await Mongo.db
+  // Atualizar ordem
+  async updateOrder(orderId, orderData) {
+    if (!ObjectId.isValid(orderId)) {
+      throw new Error('ID de ordem inválido');
+    }
+    if (!orderData || Object.keys(orderData).length === 0) {
+      throw new Error('Dados de atualização são obrigatórios');
+    }
+    try {
+      console.log('Atualizando ordem com ID:', orderId, 'Dados:', orderData);
+      const result = await Mongo.db
         .collection(collectionName)
         .findOneAndUpdate(
-            { _id: new ObjectId(orderId) },
-            { $set: orderData }
-        )
+          { _id: new ObjectId(orderId) },
+          { $set: orderData },
+          { returnDocument: 'after' }
+        );
+      console.log('Resultado da atualização:', result);
 
-        return result
+      if (!result.value) {
+        // Verificar se a ordem existe
+        const existing = await Mongo.db.collection(collectionName).findOne({ _id: new ObjectId(orderId) });
+        if (!existing) {
+          throw new Error('Ordem não encontrada');
+        }
+        console.log('Ordem existente retornada:', existing);
+        return existing;
+      }
+
+      return result.value;
+    } catch (error) {
+      console.error('Erro ao atualizar ordem:', error.message);
+      throw new Error(`Erro ao atualizar ordem: ${error.message}`);
     }
-    
+  }
 }

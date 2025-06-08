@@ -28,7 +28,7 @@ function CardapioPublico() {
     <div className="cardapio-page" style={{ backgroundImage: `url(${bgImage})` }}>
       <nav className="cardapio-navbar">
         
-        <Link to="/" className="nav-icon">
+        <Link to="/" className="nav-icon-user">
           <FiHome size={24} />
         </Link>
       </nav>

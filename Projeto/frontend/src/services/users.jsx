@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-export default function usersServices() {
+export default function useUsersServices() {
   const [usersLoading, setUsersLoading] = useState(false);
   const [refetchUsers, setRefetchUsers] = useState(true);
   const [usersList, setUsersList] = useState([]);

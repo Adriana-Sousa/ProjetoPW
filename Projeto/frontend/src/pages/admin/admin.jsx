@@ -1,16 +1,17 @@
+// src/pages/AdminPage.jsx
 import './admin.css';
-import bgImage from '../../assets/FOTOBASE.jpg';
+import bgImage from '../../assets/FOTOBASE.JPG';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiLogOut } from 'react-icons/fi';
 import { MdRestaurantMenu } from 'react-icons/md';
 import { useState, useEffect } from 'react';
 import usePlatesServices from '../../services/plates';
+import useUsersServices from '../../services/users';
 import { useAuth } from '../../hooks/useAuth';
 
 function AdminPage() {
-  const { isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
-
   const {
     getPlates,
     addPlate,
@@ -19,7 +20,9 @@ function AdminPage() {
     refetchPlates,
     setRefetchPlates,
   } = usePlatesServices();
+  const { changePassword, usersLoading, error: usersError } = useUsersServices();
 
+  // Estados para adicionar prato
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [preco, setPreco] = useState('');
@@ -27,17 +30,72 @@ function AdminPage() {
   const [ingredientes, setIngredientes] = useState('');
   const [imgUrl, setImgUrl] = useState('');
 
+  // Estados para trocar senha
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
+  });
+  const [passwordErrors, setPasswordErrors] = useState({});
+
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/');
+      navigate('/login');
       return;
     }
 
     if (refetchPlates) {
-      getPlates();
+      getPlates().catch(() => alert('Erro ao carregar pratos'));
     }
   }, [isAuthenticated, navigate, refetchPlates, getPlates]);
 
+  // Validação da nova senha
+  const validatePassword = () => {
+    const errors = {};
+    const { oldPassword, newPassword, confirmNewPassword } = passwordForm;
+
+    if (!oldPassword) {
+      errors.oldPassword = 'Senha antiga é obrigatória';
+    }
+    if (!newPassword) {
+      errors.newPassword = 'Nova senha é obrigatória';
+    } else if (newPassword.length < 5) {
+      errors.newPassword = 'A senha deve ter pelo menos 5 caracteres';
+    } 
+    if (!confirmNewPassword) {
+      errors.confirmNewPassword = 'Confirmação da senha é obrigatória';
+    } else if (newPassword !== confirmNewPassword) {
+      errors.confirmNewPassword = 'As senhas não coincidem';
+    }
+
+    setPasswordErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Manipular mudança no formulário de senha
+  const handlePasswordChange = (e) => {
+    const { name, value } = e.target;
+    setPasswordForm((prev) => ({ ...prev, [name]: value }));
+    setPasswordErrors((prev) => ({ ...prev, [name]: '' }));
+  };
+
+  // Enviar formulário de troca de senha
+  const handlePasswordSubmit = async (e) => {
+    e.preventDefault();
+    if (!validatePassword()) return;
+
+    const { oldPassword, newPassword } = passwordForm;
+    const result = await changePassword(user._id, { oldPassword, newPassword });
+
+    if (result.success) {
+      alert('Senha alterada com sucesso!');
+      setPasswordForm({ oldPassword: '', newPassword: '', confirmNewPassword: '' });
+    } else {
+      alert(`Erro ao alterar senha: ${result.error || 'Erro desconhecido'}`);
+    }
+  };
+
+  // Enviar formulário de prato
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -63,7 +121,7 @@ function AdminPage() {
       setImgUrl('');
       setRefetchPlates(true);
     } else {
-      alert(`Erro ao adicionar prato: ${response.message}`);
+      alert(`Erro ao adicionar prato: ${response.error || response.message}`);
     }
   };
 
@@ -104,6 +162,7 @@ function AdminPage() {
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               required
+              aria-label="Nome do prato"
             />
             <input
               type="text"
@@ -111,6 +170,7 @@ function AdminPage() {
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
               required
+              aria-label="Descrição do prato"
             />
             <input
               type="number"
@@ -119,11 +179,13 @@ function AdminPage() {
               value={preco}
               onChange={(e) => setPreco(e.target.value)}
               required
+              aria-label="Preço do prato"
             />
             <select
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
               required
+              aria-label="Categoria do prato"
             >
               <option value="entrada">Entrada</option>
               <option value="principal">Prato Principal</option>
@@ -135,12 +197,14 @@ function AdminPage() {
               placeholder="Ingredientes (separados por vírgula)"
               value={ingredientes}
               onChange={(e) => setIngredientes(e.target.value)}
+              aria-label="Ingredientes do prato"
             />
             <input
               type="text"
               placeholder="URL da Imagem"
               value={imgUrl}
               onChange={(e) => setImgUrl(e.target.value)}
+              aria-label="URL da imagem do prato"
             />
             <button type="submit" className="admin-button" disabled={platesLoading}>
               {platesLoading ? 'Adicionando...' : 'Adicionar Prato'}
@@ -150,11 +214,76 @@ function AdminPage() {
 
         <section className="admin-section">
           <h2>Trocar Senha</h2>
-          <form className="trocar-senha-form">
-            <input type="password" placeholder="Senha atual" />
-            <input type="password" placeholder="Nova senha" />
-            <input type="password" placeholder="Confirmar nova senha" />
-            <button className="admin-button">Trocar Senha</button>
+          {usersError && <p className="error" role="alert">{usersError}</p>}
+          <form onSubmit={handlePasswordSubmit} className="trocar-senha-form">
+            <div className="form-group">
+              <input
+                type="password"
+                name="oldPassword"
+                placeholder="Senha atual"
+                value={passwordForm.oldPassword}
+                onChange={handlePasswordChange}
+                disabled={usersLoading}
+                aria-label="Senha atual"
+                aria-invalid={!!passwordErrors.oldPassword}
+                aria-describedby={
+                  passwordErrors.oldPassword ? 'oldPassword-error' : undefined
+                }
+              />
+              {passwordErrors.oldPassword && (
+                <span id="oldPassword-error" className="error-text">
+                  {passwordErrors.oldPassword}
+                </span>
+              )}
+            </div>
+            <div className="form-group">
+              <input
+                type="password"
+                name="newPassword"
+                placeholder="Nova senha"
+                value={passwordForm.newPassword}
+                onChange={handlePasswordChange}
+                disabled={usersLoading}
+                aria-label="Nova senha"
+                aria-invalid={!!passwordErrors.newPassword}
+                aria-describedby={
+                  passwordErrors.newPassword ? 'newPassword-error' : undefined
+                }
+              />
+              {passwordErrors.newPassword && (
+                <span id="newPassword-error" className="error-text">
+                  {passwordErrors.newPassword}
+                </span>
+              )}
+            </div>
+            <div className="form-group">
+              <input
+                type="password"
+                name="confirmNewPassword"
+                placeholder="Confirmar nova senha"
+                value={passwordForm.confirmNewPassword}
+                onChange={handlePasswordChange}
+                disabled={usersLoading}
+                aria-label="Confirmar nova senha"
+                aria-invalid={!!passwordErrors.confirmNewPassword}
+                aria-describedby={
+                  passwordErrors.confirmNewPassword ? 'confirmNewPassword-error' : undefined
+                }
+              />
+              {passwordErrors.confirmNewPassword && (
+                <span id="confirmNewPassword-error" className="error-text">
+                  {passwordErrors.confirmNewPassword}
+                </span>
+              )}
+            </div>
+            <button
+              type="submit"
+              className="admin-button"
+              disabled={usersLoading}
+              aria-label="Trocar senha"
+            >
+              {usersLoading ? 'Alterando...' : 'Trocar Senha'}
+            </button>
           </form>
         </section>
 
@@ -162,7 +291,12 @@ function AdminPage() {
           <Link to="/cardapio-admin" className="admin-icon-link" title="Área de Cardápio">
             <MdRestaurantMenu size={24} />
           </Link>
-          <button onClick={handleLogout} className="admin-icon-link" title="Sair">
+          <button
+            onClick={handleLogout}
+            className="admin-icon-link"
+            title="Sair"
+            aria-label="Sair"
+          >
             <FiLogOut size={24} />
           </button>
         </div>

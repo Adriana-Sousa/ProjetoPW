@@ -52,7 +52,7 @@ function Login() {
 
     try {
       await login(formData);
-
+      
       // Navegação será tratada pelo useEffect quando isAuthenticated mudar
     } catch (err) {
       console.error('Erro no login:', err);

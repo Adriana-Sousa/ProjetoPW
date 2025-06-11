@@ -1,3 +1,4 @@
+// src/pages/CardapioUsuario.jsx
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiHome, FiShoppingCart, FiHeart, FiLogOut, FiUser } from 'react-icons/fi';
@@ -7,31 +8,43 @@ import './cardapio.css';
 import { useCarrinho } from '../../context/carrinhoContext';
 import usePlatesServices from '../../services/plates';
 import { useAuth } from '../../hooks/useAuth';
-import { useFavoritos } from '../../hooks/useFavoritos';
+import { useFavorites } from '../../context/favoritesContext';
 
 function CardapioUsuario() {
   const [pratoSelecionado, setPratoSelecionado] = useState(null);
   const [busca, setBusca] = useState('');
   const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
-  const { favoritos, toggleFavorito } = useFavoritos();
+  const { favoritos, toggleFavorito, favoritesLoading, favoritesError, isFavorited , atualizarFavoritos, getFavorites} = useFavorites();
   const navigate = useNavigate();
   const { carrinho, adicionarAoCarrinho } = useCarrinho();
   const { getAvailablePlates, platesList, platesLoading, refetchPlates } = usePlatesServices();
-  const { logout } = useAuth(); 
-
+  const { logout, isAuthenticated, user } = useAuth();
 
   useEffect(() => {
-    if(refetchPlates){
-    getAvailablePlates();}
-  }, [getAvailablePlates, refetchPlates]);
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    if (refetchPlates) {
+      getAvailablePlates().catch(() => alert('Erro ao carregar pratos'));
+      getFavorites;
+    }
+  }, [isAuthenticated, navigate, getAvailablePlates, refetchPlates]);
 
   const abrirModal = (prato) => setPratoSelecionado(prato);
   const fecharModal = () => setPratoSelecionado(null);
 
-
   const handleLogout = () => {
+    atualizarFavoritos();
     logout();
     navigate('/logout');
+  };
+
+  const handleToggleFavorito = async (prato) => {
+    const result = await toggleFavorito(prato);
+    if (!result.success) {
+      alert(`Erro ao favoritar prato: ${result.error}`);
+    }
   };
 
   const pratosFiltrados = platesList.filter((prato) =>
@@ -39,58 +52,90 @@ function CardapioUsuario() {
   );
 
   return (
-  <div className="cardapio-page" style={{ backgroundImage: `url(${bgImage})` }}>
-    <nav className="cardapio-navbar">
-      <input
-        type="text"
-        placeholder="Pesquisar..."
-        value={busca}
-        onChange={(e) => setBusca(e.target.value)}
-        className="search-input"
-      />
-      <div className="nav-actions">
-          <Link to="/" className="nav-icon-user">
+    <div className="cardapio-page" style={{ backgroundImage: `url(${bgImage})` }}>
+      <nav className="cardapio-navbar">
+        <input
+          type="text"
+          placeholder="Pesquisar..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          className="search-input"
+          aria-label="Pesquisar pratos"
+        />
+        <div className="nav-actions">
+          <Link to="/" className="nav-icon-user" aria-label="Página inicial">
             <FiHome size={24} />
           </Link>
-          <Link to="/user-page" className="nav-icon-user">
+          <Link to="/user-page" className="nav-icon-user" aria-label="Perfil do usuário">
             <FiUser size={24} />
           </Link>
           <div className={`carrinho-container ${mostrarCarrinho ? 'ativo' : ''}`}>
-            <FiShoppingCart size={24} className="nav-icon-user" onClick={() => setMostrarCarrinho(!mostrarCarrinho)} />
+            <FiShoppingCart
+              size={24}
+              className="nav-icon-user"
+              onClick={() => setMostrarCarrinho(!mostrarCarrinho)}
+              aria-label="Toggle carrinho"
+            />
             {carrinho.length > 0 && <span className="carrinho-count">{carrinho.length}</span>}
           </div>
-          {/* Botão de logout */}
-          <button className="logout-btn" onClick={handleLogout} title="Sair">
+          <button
+            className="logout-btn"
+            onClick={handleLogout}
+            title="Sair"
+            aria-label="Sair"
+          >
             <FiLogOut size={24} />
           </button>
-      </div>
-    </nav>
-        {mostrarCarrinho && (
-          <div className="carrinho-dropdown">
-              {carrinho.length === 0 ? <p>Vazio</p> : (
-                <>
-                  {carrinho.map((item, idx) => (
-                    <div key={idx} className="carrinho-item">
-                      <img src={item.imgUrl} alt={item.name} />
-                      <span>{item.name}</span>
-                    </div>
-                  ))}
-                  <Link to="/cart" className="ir-para-carrinho">Ir para o Carrinho →</Link>
-                </>
-              )}
-          </div>
-          
-        )}
+        </div>
+      </nav>
+      {mostrarCarrinho && (
+        <div className="carrinho-dropdown">
+          {carrinho.length === 0 ? (
+            <p>Vazio</p>
+          ) : (
+            <>
+              {carrinho.map((item, idx) => (
+                <div key={idx} className="carrinho-item">
+                  <img src={item.imgUrl} alt={item.name} />
+                  <span>{item.name}</span>
+                </div>
+              ))}
+              <Link to="/cart" className="ir-para-carrinho">
+                Ir para o Carrinho →
+              </Link>
+            </>
+          )}
+        </div>
+      )}
 
-      {platesLoading ? <p className="loading">Carregando pratos...</p> : (
+      {favoritesError && (
+        <p className="error" role="alert">
+          Erro ao carregar favoritos: {favoritesError}
+        </p>
+      )}
+      {platesLoading ? (
+        <p className="loading">Carregando pratos...</p>
+      ) : (
         <div className="pratos-grid">
           {pratosFiltrados.map((prato) => (
             <div key={prato._id} className="prato-card">
-              <img src={prato.imgUrl} alt={prato.name} onClick={() => abrirModal(prato)} />
+              <img
+                src={prato.imgUrl}
+                alt={prato.name}
+                onClick={() => abrirModal(prato)}
+                className="prato-image"
+              />
               <p>{prato.name}</p>
               <div className="favoritar-container">
-                <button className="favoritar-button" onClick={() => toggleFavorito(prato)}>
-                  {favoritos.some(f => f._id === prato._id) ? (
+                <button
+                  className="favoritar-button"
+                  onClick={() => handleToggleFavorito(prato)}
+                  disabled={favoritesLoading}
+                  aria-label={
+                    isFavorited(prato._id) ? 'Remover dos favoritos' : 'Adicionar aos favoritos'
+                  }
+                >
+                  {isFavorited(prato._id) ? (
                     <FaHeart color="red" />
                   ) : (
                     <FiHeart color="gray" />
@@ -108,9 +153,18 @@ function CardapioUsuario() {
             <h2>{pratoSelecionado.name}</h2>
             <img src={pratoSelecionado.imgUrl} alt={pratoSelecionado.name} />
             <p>{pratoSelecionado.description}</p>
-            <p><strong>R$ {pratoSelecionado.price.toFixed(2)}</strong></p>
+            <p>
+              <strong>R$ {pratoSelecionado.price.toFixed(2)}</strong>
+            </p>
             <div className="modal-buttons">
-              <button onClick={() => { adicionarAoCarrinho(pratoSelecionado); fecharModal(); }}>Adicionar ao carrinho</button>
+              <button
+                onClick={() => {
+                  adicionarAoCarrinho(pratoSelecionado);
+                  fecharModal();
+                }}
+              >
+                Adicionar ao carrinho
+              </button>
               <button onClick={fecharModal}>Fechar</button>
             </div>
           </div>

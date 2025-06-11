@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { FiHome, FiShoppingCart, FiLogOut } from 'react-icons/fi';
 import { MdRestaurantMenu } from 'react-icons/md';
 import { useCarrinho } from '../../context/carrinhoContext';
-import { useFavoritos } from '../../hooks/useFavoritos';
+import { useFavorites } from '../../context/favoritesContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -13,25 +13,29 @@ import useUsersServices from '../../services/users';
 function UserPage() {
   const { logout, user } = useAuth();
   const { carrinho } = useCarrinho();
- const { favoritos, removerFavorito } = useFavoritos();
+  const { favoritos, removerFavorito, atualizarFavoritos, refetchFavorites, isFavorited } = useFavorites();
   const [ultimasEscolhas, setUltimasEscolhas] = useState([]);
   const navigate = useNavigate();
   const { changePassword, usersLoading, error: usersError } = useUsersServices();
 
   // Estados para trocar senha
-    const [passwordForm, setPasswordForm] = useState({
-      oldPassword: '',
-      newPassword: '',
-      confirmNewPassword: '',
-    });
-    const [passwordErrors, setPasswordErrors] = useState({});
+  const [passwordForm, setPasswordForm] = useState({
+    oldPassword: '',
+    newPassword: '',
+    confirmNewPassword: '',
+  });
+  const [passwordErrors, setPasswordErrors] = useState({});
 
- useEffect(() => {
+  // Estado para atualizar favoritos
+  const [favoritesForm, setFavoritesForm] = useState('');
+  const [favoritesFormError, setFavoritesFormError] = useState('');
+
+  useEffect(() => {
     const ultimos = [...carrinho].slice(-3).reverse();
     setUltimasEscolhas(ultimos);
   }, [carrinho]);
 
-    // Validação da nova senha
+  // Validação da nova senha
   const validatePassword = () => {
     const errors = {};
     const { oldPassword, newPassword, confirmNewPassword } = passwordForm;
@@ -76,8 +80,9 @@ function UserPage() {
       alert(`Erro ao alterar senha: ${result.error || 'Erro desconhecido'}`);
     }
   };
-  
+
   const handleLogout = () => {
+    atualizarFavoritos();
     logout();
     navigate('/logout');
   };
@@ -92,7 +97,7 @@ function UserPage() {
           <FiShoppingCart size={20} />
         </Link>
         <Link to="/cardapio-user" className="admin-icon-link" title="Cardápio">
-            <MdRestaurantMenu size={20} />
+          <MdRestaurantMenu size={20} />
         </Link>
         <button className="admin-icon-link" title="Sair" onClick={handleLogout}>
           <FiLogOut size={20} />
@@ -134,6 +139,7 @@ function UserPage() {
             </ul>
           )}
         </div>
+
         <section className="admin-section">
           <h2>Trocar Senha</h2>
           {usersError && <p className="error" role="alert">{usersError}</p>}

@@ -6,6 +6,7 @@ import authRouter from './auth/auth.js'
 import usersRouter from './routes/users.js'
 import platesRouter from './routes/plates.js'
 import ordersRouter from './routes/orders.js'
+import favoritesRouter from './routes/favorites.js'
 
 config()
 async function main() {
@@ -35,6 +36,7 @@ async function main() {
     app.use('/users', usersRouter)
     app.use('/plates', platesRouter)
     app.use('/orders', ordersRouter)
+    app.use('/favorites', favoritesRouter)
 
     app.listen(port, () => {
         console.log(`Server running on: http://${hostname}:${port}`)

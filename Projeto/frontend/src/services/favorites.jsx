@@ -5,6 +5,7 @@ export default function useFavoritesServices() {
   const [favoritesLoading, setFavoritesLoading] = useState(false);
   const [favoritesError, setFavoritesError] = useState('');
   const [favoritesList, setFavoritesList] = useState([]);
+  const [refetchFavorites, setRefetchFavorites] = useState(true);
   const { token, user } = useAuth();
 
   const baseUrl = 'http://localhost:3000/favorites';
@@ -12,7 +13,6 @@ export default function useFavoritesServices() {
   const getHeaders = () => ({
     'Content-Type': 'application/json',
     ...(token && { Authorization: `Bearer ${token}` }),
-    'Cache-Control': 'no-cache',
   });
 
   const handleFetch = async (url, options) => {
@@ -45,6 +45,7 @@ export default function useFavoritesServices() {
     const result = await handleFetch(baseUrl, { method: 'GET' });
     if (result.success) {
       setFavoritesList(result.data.plates || []);
+      setRefetchFavorites(false);
     }
     return result;
   };
@@ -56,7 +57,7 @@ export default function useFavoritesServices() {
     }
     const result = await handleFetch(`${baseUrl}/${plateId}`, { method: 'POST' });
     if (result.success) {
-      setFavoritesList(prev => [...prev, result.data.plateId]); // Atualiza localmente
+      setRefetchFavorites(true); // Forçar recarregamento dos favoritos
     }
     return result;
   };
@@ -68,7 +69,22 @@ export default function useFavoritesServices() {
     }
     const result = await handleFetch(`${baseUrl}/${plateId}`, { method: 'DELETE' });
     if (result.success) {
-      setFavoritesList(prev => prev.filter(p => p._id !== plateId));
+      setRefetchFavorites(true); // Forçar recarregamento dos favoritos
+    }
+    return result;
+  };
+
+  const updateFavorites = async (plateIds) => {
+    if (!Array.isArray(plateIds) || plateIds.some(id => !/^[0-9a-fA-F]{24}$/.test(id))) {
+      setFavoritesError('Lista de IDs de pratos inválida');
+      return { success: false, error: 'Lista de IDs de pratos inválida', statusCode: 400 };
+    }
+    const result = await handleFetch(baseUrl, {
+      method: 'PUT',
+      body: JSON.stringify({ plateIds }),
+    });
+    if (result.success) {
+      setRefetchFavorites(true); // Forçar refetch para obter a lista atualizada
     }
     return result;
   };
@@ -77,8 +93,10 @@ export default function useFavoritesServices() {
     getFavorites,
     addFavorite,
     removeFavorite,
+    updateFavorites,
     favoritesLoading,
     favoritesError,
     favoritesList,
+    refetchFavorites,
   };
 }

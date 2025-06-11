@@ -34,6 +34,20 @@ export default class FavoritesControllers {
     }
   }
 
+  async updateFavorites(userId, plateIds) {
+    try {
+      console.log('Controlador: Adicionando favorito:', { userId, plateIds });
+      const result = await this.dataAccess.updateFavorites(userId, plateIds);
+      return ok(result);
+    } catch (error) {
+      console.error('Controlador: Erro ao adicionar favorito:', error.message);
+      if (error.message.includes('inválido') || error.message.includes('não encontrado')) {
+        return badRequest(error.message);
+      }
+      return serverError(error.message);
+    }
+  }
+
   async removeFavorite(userId, plateId) {
     try {
       console.log('Controlador: Removendo favorito:', { userId, plateId });

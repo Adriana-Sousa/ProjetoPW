@@ -34,6 +34,47 @@ export default class FavoritesDataAccess {
     }
   }
 
+  async updateFavorites(userId, plateIds) {
+    if (!ObjectId.isValid(userId) || !Array.isArray(plateIds) || plateIds.some(id => !ObjectId.isValid(id))) {
+      console.error('DataAccess: ID inválido:', { userId, plateIds });
+      throw new Error('ID de usuário ou lista de pratos inválida');
+    }
+    try {
+      console.log('DataAccess: Atualizando favoritos:', { userId, plateIds });
+
+      // Verificar se todos os pratos existem
+      const plates = await Mongo.db
+        .collection('plates')
+        .find({ _id: { $in: plateIds.map(id => new ObjectId(id)) } })
+        .toArray();
+
+      if (plates.length !== plateIds.length) {
+        console.error('DataAccess: Um ou mais pratos não encontrados:', plateIds);
+        throw new Error('Um ou mais pratos não encontrados');
+      }
+
+      const result = await Mongo.db
+        .collection(collectionName)
+        .updateOne(
+          { userId: new ObjectId(userId) },
+          {
+            $set: { 
+              plateIds: plateIds.map(id => new ObjectId(id)),
+              updatedAt: new Date()
+            },
+            $setOnInsert: { createdAt: new Date() }
+          },
+          { upsert: true }
+        );
+
+      console.log('DataAccess: Favoritos atualizados:', { userId, modifiedCount: result.modifiedCount });
+      return { userId, message: 'Favoritos atualizados com sucesso' };
+    } catch (error) {
+      console.error('DataAccess: Erro ao atualizar favoritos:', error.message);
+      throw new Error('Erro ao atualizar favoritos');
+    }
+  }
+
   async addFavorite(userId, plateId) {
     if (!ObjectId.isValid(userId) || !ObjectId.isValid(plateId)) {
       console.error('DataAccess: ID inválido:', { userId, plateId });
@@ -56,7 +97,7 @@ export default class FavoritesDataAccess {
         .updateOne(
           { userId: new ObjectId(userId) },
           {
-            $addToSet: { plateIds: new ObjectId(plateId) }, // Evita duplicatas
+            $addToSet: { plateIds: new ObjectId(plateId) },
             $setOnInsert: { createdAt: new Date() },
             $set: { updatedAt: new Date() }
           },

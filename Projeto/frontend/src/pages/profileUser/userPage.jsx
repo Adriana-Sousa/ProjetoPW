@@ -1,21 +1,30 @@
 import './userPage.css';
 import bgImage from '../../assets/FOTOBASE.JPG';
 import { Link } from 'react-router-dom';
-import { FiHome, FiShoppingCart, FiLogOut } from 'react-icons/fi';
+import { FiHome, FiShoppingCart, FiLogOut, FiEye, FiEyeOff } from 'react-icons/fi';
 import { MdRestaurantMenu } from 'react-icons/md';
 import { useCarrinho } from '../../context/carrinhoContext';
-import { useFavorites } from '../../context/favoritesContext';
+import { useFavoritos } from '../../hooks/useFavoritos';
 import { useAuth } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useUsersServices from '../../services/users';
 
+const statusMap = {
+  Pending: "Preparando",
+  Ready: "Pronto para retirada",
+  Delivered: "Entregue",
+  Cancelled: "Cancelado"
+};
+
 function UserPage() {
   const { logout, user } = useAuth();
   const { carrinho } = useCarrinho();
-  const { favoritos, removerFavorito, atualizarFavoritos, refetchFavorites, isFavorited } = useFavorites();
+  const { favoritos, removerFavorito } = useFavoritos();
   const [ultimasEscolhas, setUltimasEscolhas] = useState([]);
   const navigate = useNavigate();
+  const [pedidos, setPedidos] = useState([]);
+  const [pedidosLoading, setPedidosLoading] = useState(false);
   const { changePassword, usersLoading, error: usersError } = useUsersServices();
 
   // Estados para trocar senha
@@ -25,15 +34,34 @@ function UserPage() {
     confirmNewPassword: '',
   });
   const [passwordErrors, setPasswordErrors] = useState({});
-
-  // Estado para atualizar favoritos
-  const [favoritesForm, setFavoritesForm] = useState('');
-  const [favoritesFormError, setFavoritesFormError] = useState('');
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
 
   useEffect(() => {
     const ultimos = [...carrinho].slice(-3).reverse();
     setUltimasEscolhas(ultimos);
   }, [carrinho]);
+
+  useEffect(() => {
+    const fetchPedidos = async () => {
+      setPedidosLoading(true);
+      try {
+        const response = await fetch(`http://localhost:3000/orders/user/${user._id}`, {
+          headers: {
+            'Authorization': `Bearer ${user.token}`
+          }
+        });
+        const result = await response.json();
+        if (result.success) setPedidos(result.body);
+      } catch {
+        // Trate erro
+      } finally {
+        setPedidosLoading(false);
+      }
+    };
+    if (user?._id) fetchPedidos();
+  }, [user]);
 
   // Validação da nova senha
   const validatePassword = () => {
@@ -82,34 +110,41 @@ function UserPage() {
   };
 
   const handleLogout = () => {
-    atualizarFavoritos();
     logout();
     navigate('/logout');
   };
 
+  // Separar pedidos atuais e anteriores
+  const pedidosAtuais = pedidos.filter(
+    p => p.pickupStatus === "Pending" || p.pickupStatus === "Ready"
+  );
+  const pedidosAnteriores = pedidos.filter(
+    p => p.pickupStatus === "Delivered" || p.pickupStatus === "Cancelled"
+  );
+
   return (
     <div className="user-page" style={{ backgroundImage: `url(${bgImage})` }}>
-      <div className="admin-icons-links">
-        <Link to="/cardapio-user" className="admin-icon-link" title="Cardápio">
+      <div className="user-icons-links">
+        <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
           <FiHome size={20} />
         </Link>
-        <Link to="/cart" className="admin-icon-link" title="Carrinho">
+        <Link to="/cart" className="user-icon-link" title="Carrinho">
           <FiShoppingCart size={20} />
         </Link>
-        <Link to="/cardapio-user" className="admin-icon-link" title="Cardápio">
+        <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
           <MdRestaurantMenu size={20} />
         </Link>
-        <button className="admin-icon-link" title="Sair" onClick={handleLogout}>
+        <button className="user-icon-link" title="Sair" onClick={handleLogout}>
           <FiLogOut size={20} />
         </button>
       </div>
 
-      <div className="admin-content">
-        <div className="admin-header">
+      <div className="user-content">
+        <div className="user-header">
           <h1>Olá, {user?.fullname || 'Usuário'}</h1>
         </div>
 
-        <div className="admin-section">
+        <div className="user-section">
           <h2>Seus Favoritos</h2>
           {favoritos.length === 0 ? (
             <p>Nenhum prato favoritado ainda.</p>
@@ -118,7 +153,7 @@ function UserPage() {
               {favoritos.map((prato) => (
                 <li key={prato._id}>
                   {prato.name}
-                  <button onClick={() => removerFavorito(prato._id)} className="remover-btn">
+                  <button onClick={() => removerFavorito(prato._id)} className="user-remover-btn">
                     Remover
                   </button>
                 </li>
@@ -127,7 +162,7 @@ function UserPage() {
           )}
         </div>
 
-        <div className="admin-section">
+        <div className="user-section">
           <h2>Últimas Escolhas</h2>
           {ultimasEscolhas.length === 0 ? (
             <p>Você ainda não escolheu nenhum prato.</p>
@@ -140,13 +175,61 @@ function UserPage() {
           )}
         </div>
 
-        <section className="admin-section">
+        <div className="user-section">
+          <h2>Pedidos Atuais</h2>
+          {pedidosLoading ? (
+            <p>Carregando pedidos...</p>
+          ) : pedidosAtuais.length === 0 ? (
+            <p>Você não possui pedidos em andamento.</p>
+          ) : (
+            <ul>
+              {pedidosAtuais.map((pedido) => (
+                <li key={pedido._id}>
+                  <strong>Status:</strong> {statusMap[pedido.pickupStatus] || pedido.pickupStatus}
+                  <ul>
+                    {pedido.orderItems?.map((item, idx) => (
+                      <li key={idx}>
+                        {item.name} <b>x{item.quantidade}</b>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="user-section">
+          <h2>Pedidos Anteriores</h2>
+          {pedidosLoading ? (
+            <p>Carregando pedidos...</p>
+          ) : pedidosAnteriores.length === 0 ? (
+            <p>Você não possui pedidos anteriores.</p>
+          ) : (
+            <ul>
+              {pedidosAnteriores.map((pedido) => (
+                <li key={pedido._id}>
+                  <strong>Status:</strong> {statusMap[pedido.pickupStatus] || pedido.pickupStatus}
+                  <ul>
+                    {pedido.orderItems?.map((item, idx) => (
+                      <li key={idx}>
+                        {item.name} <b>x{item.quantidade}</b>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <section className="user-section">
           <h2>Trocar Senha</h2>
           {usersError && <p className="error" role="alert">{usersError}</p>}
           <form onSubmit={handlePasswordSubmit} className="trocar-senha-form">
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative' }}>
               <input
-                type="password"
+                type={showOldPassword ? "text" : "password"}
                 name="oldPassword"
                 placeholder="Senha atual"
                 value={passwordForm.oldPassword}
@@ -158,15 +241,24 @@ function UserPage() {
                   passwordErrors.oldPassword ? 'oldPassword-error' : undefined
                 }
               />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowOldPassword((v) => !v)}
+                aria-label={showOldPassword ? "Ocultar senha" : "Mostrar senha"}
+                tabIndex={-1}
+              >
+                {showOldPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
               {passwordErrors.oldPassword && (
                 <span id="oldPassword-error" className="error-text">
                   {passwordErrors.oldPassword}
                 </span>
               )}
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative' }}>
               <input
-                type="password"
+                type={showNewPassword ? "text" : "password"}
                 name="newPassword"
                 placeholder="Nova senha"
                 value={passwordForm.newPassword}
@@ -178,15 +270,24 @@ function UserPage() {
                   passwordErrors.newPassword ? 'newPassword-error' : undefined
                 }
               />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowNewPassword((v) => !v)}
+                aria-label={showNewPassword ? "Ocultar senha" : "Mostrar senha"}
+                tabIndex={-1}
+              >
+                {showNewPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
               {passwordErrors.newPassword && (
                 <span id="newPassword-error" className="error-text">
                   {passwordErrors.newPassword}
                 </span>
               )}
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative' }}>
               <input
-                type="password"
+                type={showConfirmNewPassword ? "text" : "password"}
                 name="confirmNewPassword"
                 placeholder="Confirmar nova senha"
                 value={passwordForm.confirmNewPassword}
@@ -198,6 +299,15 @@ function UserPage() {
                   passwordErrors.confirmNewPassword ? 'confirmNewPassword-error' : undefined
                 }
               />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirmNewPassword((v) => !v)}
+                aria-label={showConfirmNewPassword ? "Ocultar senha" : "Mostrar senha"}
+                tabIndex={-1}
+              >
+                {showConfirmNewPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
               {passwordErrors.confirmNewPassword && (
                 <span id="confirmNewPassword-error" className="error-text">
                   {passwordErrors.confirmNewPassword}
@@ -214,6 +324,7 @@ function UserPage() {
             </button>
           </form>
         </section>
+
       </div>
     </div>
   );

@@ -65,6 +65,12 @@ export default class OrdersControllers {
 
   async updateOrder(orderId, orderData) {
     try {
+          // Validação dos status permitidos
+      const allowedStatus = ["Pending", "Ready", "Delivered", "Cancelled"];
+      if (orderData.pickupStatus && !allowedStatus.includes(orderData.pickupStatus)) {
+        return badRequest("Status inválido");
+      }
+      
       console.log('Controlador: Atualizando ordem com ID:', orderId, 'Dados:', orderData);
       const result = await this.dataAccess.updateOrder(orderId, orderData);
       return ok(result);

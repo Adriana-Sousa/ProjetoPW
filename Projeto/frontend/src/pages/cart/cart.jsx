@@ -3,16 +3,48 @@ import { FiArrowLeft, FiTrash2 } from 'react-icons/fi';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useCarrinho } from '../../context/carrinhoContext';
+import { useAuth } from '../../hooks/useAuth';
 
 function Carrinho() {
   const { carrinho, removerItem, incrementarQuantidade, decrementarQuantidade, total, limparCarrinho } = useCarrinho();
+  const { user, token } = useAuth();
 
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const navigate = useNavigate();
 
-  const finalizarCompra = () => {
-    setMostrarPopup(true);
-    limparCarrinho();
+const finalizarCompra = async () => {
+  const pedido = {
+    userId: user?._id,
+    items: carrinho.map(item => ({
+      plateId: item._id,
+      name: item.name,
+      quantidade: item.quantidade,
+      preco: item.price
+    })),
+    total: total 
+  };
+
+  try {
+    const response = await fetch('http://localhost:3000/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(pedido)
+       });
+
+      const result = await response.json();
+      if (result.success) {
+        setMostrarPopup(true);
+        limparCarrinho();
+      } else {
+        alert('Erro ao finalizar pedido!');
+      }
+    } catch (error) {
+       console.error(error);
+       alert('Erro de comunicação com o servidor!');
+      }
   };
 
   const continuarComprando = () => {

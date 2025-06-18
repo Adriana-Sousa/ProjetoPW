@@ -84,7 +84,7 @@ function CardapioAdmin() {
         alert('Prato atualizado com sucesso!');
         setPratoSelecionado(null);
       }
-    } catch (error) {
+    } catch {
       setError('Erro inesperado ao atualizar prato');
       alert('Erro inesperado ao atualizar prato');
     } finally {
@@ -101,7 +101,7 @@ function CardapioAdmin() {
         } else {
           alert('Prato excluído com sucesso!');
         }
-      } catch (error) {
+      } catch {
         alert('Erro ao excluir prato');
       }
     }
@@ -133,17 +133,15 @@ function CardapioAdmin() {
           {platesList.map((prato) => (
             <div key={prato._id} className="prato-card">
               {prato.imgUrl ? (
-                                      <img
-                                        src={prato.imgUrl}
-                                        alt={prato.name}
-
-                                      />
-                                    ) : (
-                                      <img
-                                        src="/placeholder.jpg"
-                                        alt={prato.name}
-                                        
-                                      />
+                <img
+                  src={prato.imgUrl}
+                  alt={prato.name}
+                />
+              ) : (
+                <img
+                  src="/placeholder.jpg"
+                  alt={prato.name}
+                />
                                     )}
               <p>{prato.name}</p>
               <p>R${prato.price.toFixed(2)}</p>

@@ -31,6 +31,17 @@
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px var(--cor-fundo ) inset !important;
+  box-shadow: 0 0 0 1000px var(--cor-fundo) inset !important;
+  -webkit-text-fill-color: var(--cor-texto, #fff) !important;
+  caret-color: var(--cor-texto, #fff) !important;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
 .input-group {
   display: flex;
   align-items: center;
@@ -79,6 +90,7 @@
   gap: 0.5rem;
   margin-top: 1rem;
 }
+
 
 .admin-link, .cadastro-link {
   color: var(--cor-texto);

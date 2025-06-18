@@ -1,17 +1,31 @@
-// src/pages/AdminPage.jsx
 import './admin.css';
 import bgImage from '../../assets/FOTOBASE.JPG';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiLogOut } from 'react-icons/fi';
+import { FiLogOut, FiEye, FiEyeOff } from 'react-icons/fi';
 import { MdRestaurantMenu } from 'react-icons/md';
 import { useState, useEffect } from 'react';
-import usePlatesServices from '../../services/plates';
-import useUsersServices from '../../services/users';
 import { useAuth } from '../../hooks/useAuth';
+import useUsersServices from '../../services/users';
+import usePlatesServices from '../../hooks/usePlatesServices';
+
+const statusMap = {
+  Pending: "Preparando",
+  Ready: "Pronto para retirada",
+  Delivered: "Entregue",
+  Cancelled: "Cancelado"
+};
+
+const statusOptions = [
+  { value: "Pending", label: "Preparando" },
+  { value: "Ready", label: "Pronto para retirada" },
+  { value: "Delivered", label: "Entregue" },
+  { value: "Cancelled", label: "Cancelado" }
+];
 
 function AdminPage() {
-  const { isAuthenticated, logout, user } = useAuth();
+  const { isAuthenticated, logout, token, user } = useAuth();
   const navigate = useNavigate();
+
   const {
     getPlates,
     addPlate,
@@ -20,15 +34,46 @@ function AdminPage() {
     refetchPlates,
     setRefetchPlates,
   } = usePlatesServices();
-  const { changePassword, usersLoading, error: usersError } = useUsersServices();
 
-  // Estados para adicionar prato
+  // mudar senha
+  const { changePassword, usersLoading, error: usersError } = useUsersServices();
+  
+  const [orders, setOrders] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+
+  // Estados para formulário de prato
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [preco, setPreco] = useState('');
   const [categoria, setCategoria] = useState('sobremesa');
   const [ingredientes, setIngredientes] = useState('');
   const [imgUrl, setImgUrl] = useState('');
+
+  // Estado para edição de status do pedido
+  const [editStatusId, setEditStatusId] = useState(null);
+
+  // Estados para mostrar/esconder senha
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
+
+  // Atualizar status do pedido
+  const updateOrderStatus = async (orderId, newStatus) => {
+    try {
+      await fetch(`http://localhost:3000/orders/${orderId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ pickupStatus: newStatus })
+      });
+      setRefetchPlates(true);
+      fetchOrders();
+    } catch {
+      alert('Erro ao atualizar status do pedido');
+    }
+  };
 
   // Estados para trocar senha
   const [passwordForm, setPasswordForm] = useState({
@@ -38,6 +83,27 @@ function AdminPage() {
   });
   const [passwordErrors, setPasswordErrors] = useState({});
 
+  // Buscar pedidos ao montar
+  const fetchOrders = async () => {
+    setOrdersLoading(true);
+    try {
+      const response = await fetch('http://localhost:3000/orders', {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+      });
+
+      const result = await response.json();
+      if (result.success) setOrders(result.body);
+    } catch (error) {
+      console.error('Erro ao buscar pedidos:', error);
+      alert('Erro ao carregar pedidos. Tente novamente mais tarde.');
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -46,8 +112,11 @@ function AdminPage() {
 
     if (refetchPlates) {
       getPlates().catch(() => alert('Erro ao carregar pratos'));
+      setRefetchPlates(false);
     }
-  }, [isAuthenticated, navigate, refetchPlates, getPlates]);
+
+    fetchOrders();
+  }, [isAuthenticated, navigate, refetchPlates, token, getPlates, setRefetchPlates]);
 
   // Validação da nova senha
   const validatePassword = () => {
@@ -95,7 +164,6 @@ function AdminPage() {
     }
   };
 
-  // Enviar formulário de prato
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -162,7 +230,6 @@ function AdminPage() {
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               required
-              aria-label="Nome do prato"
             />
             <input
               type="text"
@@ -170,7 +237,6 @@ function AdminPage() {
               value={descricao}
               onChange={(e) => setDescricao(e.target.value)}
               required
-              aria-label="Descrição do prato"
             />
             <input
               type="number"
@@ -179,13 +245,11 @@ function AdminPage() {
               value={preco}
               onChange={(e) => setPreco(e.target.value)}
               required
-              aria-label="Preço do prato"
             />
             <select
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
               required
-              aria-label="Categoria do prato"
             >
               <option value="entrada">Entrada</option>
               <option value="principal">Prato Principal</option>
@@ -197,28 +261,154 @@ function AdminPage() {
               placeholder="Ingredientes (separados por vírgula)"
               value={ingredientes}
               onChange={(e) => setIngredientes(e.target.value)}
-              aria-label="Ingredientes do prato"
             />
             <input
               type="text"
               placeholder="URL da Imagem"
               value={imgUrl}
               onChange={(e) => setImgUrl(e.target.value)}
-              aria-label="URL da imagem do prato"
             />
-            <button type="submit" className="admin-button" disabled={platesLoading}>
+            <button
+              type="submit"
+              className="admin-button"
+              disabled={platesLoading}
+            >
               {platesLoading ? 'Adicionando...' : 'Adicionar Prato'}
             </button>
           </form>
+        </section>
+
+        {/* PEDIDOS DOS CLIENTES */}
+        <section className="admin-section">
+          <h2>Pedidos dos Clientes</h2>
+          {ordersLoading ? (
+            <p>Carregando pedidos...</p>
+          ) : orders.length === 0 ? (
+            <p>Nenhum pedido encontrado.</p>
+          ) : (
+            <div className="pedidos-lista">
+              {orders.map((order) => (
+                <div key={order._id} className="pedido-card">
+                  <div className="pedido-info">
+                    <span>
+                      <strong>Cliente:</strong>{' '}
+                      {order.userDetails?.[0]?.fullname || 'Desconhecido'}
+                    </span>
+                    <span>
+                      <strong>Data:</strong>{' '}
+                      {order.createdAt
+                        ? new Date(order.createdAt).toLocaleString()
+                        : '---'}
+                    </span>
+                    <span>
+                      <strong>Status:</strong> {statusMap[order.pickupStatus] || order.pickupStatus || '---'}
+                      {editStatusId === order._id ? (
+                        <select
+                          className="status-select"
+                          value={order.pickupStatus}
+                          autoFocus
+                          onBlur={() => setEditStatusId(null)}
+                          onChange={e => {
+                            updateOrderStatus(order._id, e.target.value);
+                            setEditStatusId(null);
+                          }}
+                          style={{ marginLeft: 8 }}
+                        >
+                          {statusOptions.map(opt => (
+                            <option key={opt.value} value={opt.value}>{opt.label}</option>
+                          ))}
+                        </select>
+                      ) : (
+                        <button
+                          className="status-edit-btn"
+                          onClick={() => setEditStatusId(order._id)}
+                          style={{ marginLeft: 8 }}
+                          type="button"
+                        >
+                          Alterar
+                        </button>
+                      )}
+                    </span>
+                  </div>
+                  <div className="pedido-itens">
+                    <strong>Itens:</strong>
+                    <ul>
+                      {order.orderItems?.map((item, idx) => (
+                        <li key={idx}>
+                          {item.name} <b>x{item.quantidade}</b>{' '}
+                          <span>- R$ {Number(item.preco).toFixed(2)}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="pedido-total">
+                    <strong>Total:</strong> R${' '}
+                    {order.orderItems
+                      ? order.orderItems
+                          .reduce(
+                            (acc, item) =>
+                              acc + item.preco * item.quantidade,
+                            0
+                          )
+                          .toFixed(2)
+                      : '0.00'}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </section>
+
+        {/* CONTROLE DE PEDIDOS / HISTÓRICO */}
+        <section className="admin-section">
+          <h2>Controle de Pedidos</h2>
+          {ordersLoading ? (
+            <p>Carregando histórico...</p>
+          ) : (
+            <div className="pedidos-lista">
+              {orders
+                .filter(order =>
+                  order.pickupStatus === "Delivered" || order.pickupStatus === "Cancelled"
+                )
+                .map((order) => (
+                  <div key={order._id} className="pedido-card">
+                    <div className="pedido-info">
+                      <span>
+                        <strong>Cliente:</strong> {order.userDetails?.[0]?.fullname || 'Desconhecido'}
+                      </span>
+                      <span>
+                        <strong>Status:</strong> {statusMap[order.pickupStatus] || order.pickupStatus}
+                      </span>
+                    </div>
+                    <div className="pedido-itens">
+                      <strong>Itens:</strong>
+                      <ul>
+                        {order.orderItems?.map((item, idx) => (
+                          <li key={idx}>
+                            {item.name} <b>x{item.quantidade}</b>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                ))}
+              {/* Se não houver pedidos entregues/cancelados */}
+              {orders.filter(order =>
+                order.pickupStatus === "Delivered" || order.pickupStatus === "Cancelled"
+              ).length === 0 && (
+                <p>Nenhum pedido entregue ou cancelado.</p>
+              )}
+            </div>
+          )}
         </section>
 
         <section className="admin-section">
           <h2>Trocar Senha</h2>
           {usersError && <p className="error" role="alert">{usersError}</p>}
           <form onSubmit={handlePasswordSubmit} className="trocar-senha-form">
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative' }}>
               <input
-                type="password"
+                type={showOldPassword ? "text" : "password"}
                 name="oldPassword"
                 placeholder="Senha atual"
                 value={passwordForm.oldPassword}
@@ -230,15 +420,24 @@ function AdminPage() {
                   passwordErrors.oldPassword ? 'oldPassword-error' : undefined
                 }
               />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowOldPassword(!showOldPassword)}
+                aria-label={showOldPassword ? "Ocultar senha" : "Mostrar senha"}
+                tabIndex={-1}
+              >
+                {showOldPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
               {passwordErrors.oldPassword && (
                 <span id="oldPassword-error" className="error-text">
                   {passwordErrors.oldPassword}
                 </span>
               )}
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative' }}>
               <input
-                type="password"
+                type={showNewPassword ? "text" : "password"}
                 name="newPassword"
                 placeholder="Nova senha"
                 value={passwordForm.newPassword}
@@ -250,15 +449,24 @@ function AdminPage() {
                   passwordErrors.newPassword ? 'newPassword-error' : undefined
                 }
               />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowNewPassword(!showNewPassword)}
+                aria-label={showNewPassword ? "Ocultar senha" : "Mostrar senha"}
+                tabIndex={-1}
+              >
+                {showNewPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
               {passwordErrors.newPassword && (
                 <span id="newPassword-error" className="error-text">
                   {passwordErrors.newPassword}
                 </span>
               )}
             </div>
-            <div className="form-group">
+            <div className="form-group" style={{ position: 'relative' }}>
               <input
-                type="password"
+                type={showConfirmNewPassword ? "text" : "password"}
                 name="confirmNewPassword"
                 placeholder="Confirmar nova senha"
                 value={passwordForm.confirmNewPassword}
@@ -270,6 +478,15 @@ function AdminPage() {
                   passwordErrors.confirmNewPassword ? 'confirmNewPassword-error' : undefined
                 }
               />
+              <button
+                type="button"
+                className="password-toggle"
+                onClick={() => setShowConfirmNewPassword(!showConfirmNewPassword)}
+                aria-label={showConfirmNewPassword ? "Ocultar senha" : "Mostrar senha"}
+                tabIndex={-1}
+              >
+                {showConfirmNewPassword ? <FiEyeOff /> : <FiEye />}
+              </button>
               {passwordErrors.confirmNewPassword && (
                 <span id="confirmNewPassword-error" className="error-text">
                   {passwordErrors.confirmNewPassword}
@@ -291,12 +508,7 @@ function AdminPage() {
           <Link to="/cardapio-admin" className="admin-icon-link" title="Área de Cardápio">
             <MdRestaurantMenu size={24} />
           </Link>
-          <button
-            onClick={handleLogout}
-            className="admin-icon-link"
-            title="Sair"
-            aria-label="Sair"
-          >
+          <button onClick={handleLogout} className="admin-icon-link" title="Sair">
             <FiLogOut size={24} />
           </button>
         </div>

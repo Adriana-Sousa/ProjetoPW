@@ -13,7 +13,6 @@
   box-sizing: border-box;
 }
 
-
 .admin-header h1 {
   font-size: 2rem;
   font-weight: bold;
@@ -115,6 +114,38 @@
   color: var(--cor-destaque);
 }
 
+.trocar-senha-form .password-toggle {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  cursor: pointer;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #888;
+  font-size: 1.15em;
+  height: 24px;
+  width: 24px;
+  min-width: 0;
+  min-height: 0;
+}
+
+.trocar-senha-form .password-toggle:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.trocar-senha-form .password-toggle:hover {
+  color: #222;
+  background: transparent;
+}
 
 .trocar-senha-form {
   display: flex;
@@ -130,10 +161,9 @@
   border: 1px solid;
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.1);
-  
 }
 
-.trocar-senha-form button {
+.trocar-senha-form > button {
   padding: 0.4rem 1rem; 
   background-color: rgba(255, 255, 255, 0.1);
   border: 2px solid var(--cor-destaque);
@@ -145,7 +175,7 @@
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
-.trocar-senha-form button:hover {
+.trocar-senha-form > button:hover {
   background-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
@@ -180,4 +210,72 @@
 .adicionar-prato-form button:hover {
   background-color: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
+}
+
+.pedidos-lista {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.pedido-card {
+  background: rgba(0, 0, 0, 0.85);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.18);
+  padding: 1.2rem 1.5rem;
+  min-width: 260px;
+  max-width: 400px;
+  width: 100%;
+  color: var(--cor-texto);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
+}
+
+.pedido-info span {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.pedido-itens ul {
+  margin: 8px 0 0 0;
+  padding-left: 18px;
+}
+
+.pedido-itens li {
+  margin-bottom: 2px;
+}
+
+.pedido-total {
+  margin-top: 8px;
+  font-weight: bold;
+  color: var(--cor-destaque);
+}
+
+.status-edit-btn {
+  background: none;
+  border: none;
+  color: var(--cor-destaque);
+  font-weight: bold;
+  cursor: pointer;
+  padding: 0 6px;
+  font-size: 1em;
+  transition: color 0.2s;
+}
+
+.status-edit-btn:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.status-select {
+  background: #222;
+  color: var(--cor-texto);
+  border: 1px solid var(--cor-destaque);
+  border-radius: 5px;
+  padding: 2px 8px;
+  font-size: 1em;
+  margin-left: 8px;
 }

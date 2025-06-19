@@ -115,10 +115,10 @@ function CardapioAdmin() {
   return (
     <div className="cardapio-page" style={{ backgroundImage: `url(${bgImage})` }}>
       <nav className="cardapio-navbar">
-        <button onClick={() => navigate('/admin')} className="nav-icon" title="Painel Admin">
+        <button onClick={() => navigate('/admin')} className="nav-icon-admin" title="Painel Admin">
           Voltar
         </button>
-        <button onClick={handleLogout} className="nav-icon" title="Sair">
+        <button onClick={handleLogout} className="nav-icon-admin" title="Sair">
           <FiLogOut size={24} />
         </button>
       </nav>

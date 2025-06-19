@@ -52,6 +52,19 @@
   border: 1px solid transparent;
 }
 
+.nav-icon-admin {
+  color: var(--cor-texto);
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  color: black;
+}
+
 .nav-icon-user {
   color: var(--cor-texto);
   cursor: pointer;

@@ -1,4 +1,5 @@
 import { useState } from "react";
+
 export default function AuthServices() {
   const [authLoading, setAuthLoading] = useState(false);
   const [error, setError] = useState("");
@@ -71,6 +72,8 @@ export default function AuthServices() {
   const logout = () => {
     localStorage.removeItem('auth');
     localStorage.removeItem('carrinho');
+    localStorage.removeItem('favorites');
+    localStorage.removeItem('favorites');
     setSuccess("Logout realizado com sucesso!");
     return { success: true };
   };

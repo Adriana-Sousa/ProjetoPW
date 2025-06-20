@@ -14,6 +14,8 @@ function Cadastro() {
   });
   const { signup, authLoading, error, success, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [errorCad, setError] = useState("");
+  const [successCad, setSuccess] = useState("");
 
   // Redireciona se já estiver logado
   useEffect(() => {
@@ -40,12 +42,15 @@ function Cadastro() {
       return;
     }
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setError("Informe um email válido.");
       return;
     }
     if (formData.password !== formData.confirmPassword) {
+      setError("As senhas não coincidem.");
       return;
     }
     if (formData.password && formData.password.length < 6) {
+      setError("A senha deve ter mais de 6 caracteres.");
       return;
     }
 
@@ -73,6 +78,7 @@ function Cadastro() {
         </div>
         <h1>CADASTRO</h1>
         {error && <p className="error">{error}</p>}
+        {errorCad && <p className="error">{errorCad}</p>}
         {success && <p className="success">{success}</p>}
         {authLoading && <p className="loading">Carregando...</p>}
         <form onSubmit={handleSubmitForm}>

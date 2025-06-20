@@ -4,11 +4,12 @@ import { Link } from 'react-router-dom';
 import { FiHome, FiShoppingCart, FiLogOut, FiEye, FiEyeOff } from 'react-icons/fi';
 import { MdRestaurantMenu } from 'react-icons/md';
 import { useCarrinho } from '../../context/carrinhoContext';
-import { useFavoritos } from '../../hooks/useFavoritos';
+import { useFavorites } from '../../context/favoritesContext';
 import { useAuth } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useUsersServices from '../../services/users';
+import useOrderServices from '../../services/order';
 
 const statusMap = {
   Pending: "Preparando",
@@ -20,11 +21,10 @@ const statusMap = {
 function UserPage() {
   const { logout, user } = useAuth();
   const { carrinho } = useCarrinho();
-  const { favoritos, removerFavorito } = useFavoritos();
+  const { favoritos, removerFavorito, atualizarFavoritos, refetchFavorites, isFavorited } = useFavorites();
+  const { orderLoading, refetchOrders, ordersList, deleteOrder, updateOrder, setRefetchOrders, getUserOrders } = useOrderServices();
   const [ultimasEscolhas, setUltimasEscolhas] = useState([]);
   const navigate = useNavigate();
-  const [pedidos, setPedidos] = useState([]);
-  const [pedidosLoading, setPedidosLoading] = useState(false);
   const { changePassword, usersLoading, error: usersError } = useUsersServices();
 
   // Estados para trocar senha
@@ -34,6 +34,7 @@ function UserPage() {
     confirmNewPassword: '',
   });
   const [passwordErrors, setPasswordErrors] = useState({});
+
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
@@ -43,25 +44,11 @@ function UserPage() {
     setUltimasEscolhas(ultimos);
   }, [carrinho]);
 
-  useEffect(() => {
-    const fetchPedidos = async () => {
-      setPedidosLoading(true);
-      try {
-        const response = await fetch(`http://localhost:3000/orders/user/${user._id}`, {
-          headers: {
-            'Authorization': `Bearer ${user.token}`
-          }
-        });
-        const result = await response.json();
-        if (result.success) setPedidos(result.body);
-      } catch {
-        // Trate erro
-      } finally {
-        setPedidosLoading(false);
-      }
-    };
-    if (user?._id) fetchPedidos();
-  }, [user]);
+  useEffect(()=> {
+    if(refetchOrders){
+      getUserOrders(user._id);
+    }
+  }, [refetchOrders]);
 
   // Validação da nova senha
   const validatePassword = () => {
@@ -110,20 +97,24 @@ function UserPage() {
   };
 
   const handleLogout = () => {
+    atualizarFavoritos();
     logout();
     navigate('/logout');
   };
 
   // Separar pedidos atuais e anteriores
-  const pedidosAtuais = pedidos.filter(
+  const pedidosAtuais = ordersList.filter(
     p => p.pickupStatus === "Pending" || p.pickupStatus === "Ready"
   );
-  const pedidosAnteriores = pedidos.filter(
+  const pedidosAnteriores = ordersList.filter(
     p => p.pickupStatus === "Delivered" || p.pickupStatus === "Cancelled"
   );
 
   return (
     <div className="user-page" style={{ backgroundImage: `url(${bgImage})` }}>
+      
+
+      <div className="user-content">
       <div className="user-icons-links">
         <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
           <FiHome size={20} />
@@ -138,8 +129,6 @@ function UserPage() {
           <FiLogOut size={20} />
         </button>
       </div>
-
-      <div className="user-content">
         <div className="user-header">
           <h1>Olá, {user?.fullname || 'Usuário'}</h1>
         </div>
@@ -153,7 +142,7 @@ function UserPage() {
               {favoritos.map((prato) => (
                 <li key={prato._id}>
                   {prato.name}
-                  <button onClick={() => removerFavorito(prato._id)} className="user-remover-btn">
+                  <button onClick={() => removerFavorito(prato._id)} className="remover-btn">
                     Remover
                   </button>
                 </li>
@@ -175,9 +164,9 @@ function UserPage() {
           )}
         </div>
 
-        <div className="user-section">
+         <div className="user-section">
           <h2>Pedidos Atuais</h2>
-          {pedidosLoading ? (
+          {orderLoading ? (
             <p>Carregando pedidos...</p>
           ) : pedidosAtuais.length === 0 ? (
             <p>Você não possui pedidos em andamento.</p>
@@ -201,7 +190,7 @@ function UserPage() {
 
         <div className="user-section">
           <h2>Pedidos Anteriores</h2>
-          {pedidosLoading ? (
+          {orderLoading ? (
             <p>Carregando pedidos...</p>
           ) : pedidosAnteriores.length === 0 ? (
             <p>Você não possui pedidos anteriores.</p>
@@ -279,6 +268,7 @@ function UserPage() {
               >
                 {showNewPassword ? <FiEyeOff /> : <FiEye />}
               </button>
+
               {passwordErrors.newPassword && (
                 <span id="newPassword-error" className="error-text">
                   {passwordErrors.newPassword}
@@ -324,7 +314,6 @@ function UserPage() {
             </button>
           </form>
         </section>
-
       </div>
     </div>
   );

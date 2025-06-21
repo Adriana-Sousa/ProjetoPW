@@ -8,6 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 function Login() {
   const navigate = useNavigate();
   const { login, user, authLoading, error, isAuthenticated, success, setSuccess } = useAuth();
+  const [feedeback, setFeedeback] = useState("");
   
 
   const [formData, setFormData] = useState({
@@ -44,15 +45,17 @@ function Login() {
     e.preventDefault();
 
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setFeedeback("Informe um email válido.");
       return;
     }
-    if (!formData.password.trim()) {
+    if (!formData.password.trim() || formData.password.length <= 5) {
+      setFeedeback("Informe sua senha.")
       return;
     }
 
     try {
       await login(formData);
-      
+      console.log("aqui")
       // Navegação será tratada pelo useEffect quando isAuthenticated mudar
     } catch (err) {
       console.error('Erro no login:', err);
@@ -72,6 +75,7 @@ function Login() {
         </div>
         <h1>LOGIN</h1>
         {error && <p className="error">{error}</p>}
+        {feedeback && <p className="error">{feedeback}</p>}
         {authLoading && <p className="loading">Carregando...</p>}
         <form onSubmit={handleSubmitForm}>
           <div className="input-group">

@@ -98,15 +98,17 @@ function CardapioUsuario() {
             {carrinho.length === 0 ? (
               <p>Vazio</p>
             ) : (
-              <>
+              <div className='cart-container'>
+                <div className='cart-group'>
+                  {carrinho.map((item, idx) => (
+                    <div key={idx} className="carrinho-item">
+                      <img src={item.imgUrl} alt={item.name} />
+                      <span>{item.name}</span>
+                      <span className="carrinho-qtd">x{item.quantidade || 1}</span>
+                    </div>
+                  ))}
 
-                {carrinho.map((item, idx) => (
-                  <div key={idx} className="carrinho-item">
-                    <img src={item.imgUrl} alt={item.name} />
-                    <span>{item.name}</span>
-                    <span className="carrinho-qtd">x{item.quantidade || 1}</span>
-                  </div>
-                ))}
+                </div>
                 <div className="carrinho-link-container">
                   <button
                   className="carrinho-esvaziar-btn"
@@ -124,7 +126,7 @@ function CardapioUsuario() {
                   </Link>
                 </div>
               </div>
-              </>
+              </div>
             )}
           </div>
         </div>

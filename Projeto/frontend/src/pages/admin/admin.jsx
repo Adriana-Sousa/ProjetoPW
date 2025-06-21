@@ -6,7 +6,9 @@ import { MdRestaurantMenu } from 'react-icons/md';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import useUsersServices from '../../services/users';
-import usePlatesServices from '../../hooks/usePlatesServices';
+//import usePlatesServices from '../../hooks/usePlatesServices';
+import PlatesServices from '../../services/plates';
+import useOrderServices from '../../services/order';
 
 const statusMap = {
   Pending: "Preparando",
@@ -24,6 +26,7 @@ const statusOptions = [
 
 function AdminPage() {
   const { isAuthenticated, logout, token, user } = useAuth();
+  const { orderLoading, refetchOrders, ordersList, getAllOrders, deleteOrder, updateOrder, setRefetchOrders } = useOrderServices();
   const navigate = useNavigate();
 
   const {
@@ -33,7 +36,7 @@ function AdminPage() {
     platesLoading,
     refetchPlates,
     setRefetchPlates,
-  } = usePlatesServices();
+  } = PlatesServices();
 
   // mudar senha
   const { changePassword, usersLoading, error: usersError } = useUsersServices();
@@ -69,7 +72,7 @@ function AdminPage() {
         body: JSON.stringify({ pickupStatus: newStatus })
       });
       setRefetchPlates(true);
-      fetchOrders();
+      setRefetchOrders(true);
     } catch {
       alert('Erro ao atualizar status do pedido');
     }
@@ -83,26 +86,7 @@ function AdminPage() {
   });
   const [passwordErrors, setPasswordErrors] = useState({});
 
-  // Buscar pedidos ao montar
-  const fetchOrders = async () => {
-    setOrdersLoading(true);
-    try {
-      const response = await fetch('http://localhost:3000/orders', {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-      });
-
-      const result = await response.json();
-      if (result.success) setOrders(result.body);
-    } catch (error) {
-      console.error('Erro ao buscar pedidos:', error);
-      alert('Erro ao carregar pedidos. Tente novamente mais tarde.');
-    } finally {
-      setOrdersLoading(false);
-    }
-  };
+  
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -115,8 +99,11 @@ function AdminPage() {
       setRefetchPlates(false);
     }
 
-    fetchOrders();
-  }, [isAuthenticated, navigate, refetchPlates, token, getPlates, setRefetchPlates]);
+    if(refetchOrders) {
+      getAllOrders();
+    }
+
+  }, [isAuthenticated, navigate, refetchPlates, token, getPlates, setRefetchPlates, refetchOrders]);
 
   // Validação da nova senha
   const validatePassword = () => {
@@ -281,13 +268,13 @@ function AdminPage() {
         {/* PEDIDOS DOS CLIENTES */}
         <section className="admin-section">
           <h2>Pedidos dos Clientes</h2>
-          {ordersLoading ? (
+          {orderLoading ? (
             <p>Carregando pedidos...</p>
-          ) : orders.length === 0 ? (
+          ) : ordersList.length === 0 ? (
             <p>Nenhum pedido encontrado.</p>
           ) : (
             <div className="pedidos-lista">
-              {orders.map((order) => (
+              {ordersList.map((order) => (
                 <div key={order._id} className="pedido-card">
                   <div className="pedido-info">
                     <span>
@@ -362,11 +349,11 @@ function AdminPage() {
         {/* CONTROLE DE PEDIDOS / HISTÓRICO */}
         <section className="admin-section">
           <h2>Controle de Pedidos</h2>
-          {ordersLoading ? (
+          {orderLoading ? (
             <p>Carregando histórico...</p>
           ) : (
             <div className="pedidos-lista">
-              {orders
+              {ordersList
                 .filter(order =>
                   order.pickupStatus === "Delivered" || order.pickupStatus === "Cancelled"
                 )
@@ -393,7 +380,7 @@ function AdminPage() {
                   </div>
                 ))}
               {/* Se não houver pedidos entregues/cancelados */}
-              {orders.filter(order =>
+              {ordersList.filter(order =>
                 order.pickupStatus === "Delivered" || order.pickupStatus === "Cancelled"
               ).length === 0 && (
                 <p>Nenhum pedido entregue ou cancelado.</p>

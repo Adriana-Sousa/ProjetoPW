@@ -5,6 +5,7 @@ import bgImage from '../../assets/CARDAPIO.JPG';
 import './cardapio.css';
 import PlatesServices from '../../services/plates';
 import { useAuth } from '../../hooks/useAuth';
+import MessageBox from '../../components/message/message';
 
 function CardapioAdmin() {
   const { isAuthenticated, user, logout } = useAuth();
@@ -20,7 +21,9 @@ function CardapioAdmin() {
     category: '',
     available: true,
   });
-  const [error, setError] = useState('');
+  const [errorUpdate, setErrorUpdate] = useState('');
+  const [error, setError] = useState('')
+  const [success, setSuccess] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -43,28 +46,28 @@ function CardapioAdmin() {
       category: prato.category || '',
       available: prato.available ?? true,
     });
-    setError('');
+    setErrorUpdate('');
   };
 
   const handleUpdate = async () => {
     if (isSubmitting) return;
     setIsSubmitting(true);
-    setError('');
+    setErrorUpdate('');
 
     // Validação
     if (!formData.name || !formData.price) {
-      setError('Nome e preço são obrigatórios');
+      setErrorUpdate('Nome e preço são obrigatórios');
       setIsSubmitting(false);
       return;
     }
     const price = parseFloat(formData.price);
     if (isNaN(price) || price <= 0) {
-      setError('Preço deve ser um número maior que zero');
+      setErrorUpdate('Preço deve ser um número maior que zero');
       setIsSubmitting(false);
       return;
     }
     if (formData.category && !['entrada', 'principal', 'sobremesa', 'bebida'].includes(formData.category)) {
-      setError('Categoria inválida');
+      setErrorUpdate('Categoria inválida');
       setIsSubmitting(false);
       return;
     }
@@ -78,15 +81,15 @@ function CardapioAdmin() {
     try {
       const result = await updatePlate(pratoSelecionado._id, data);
       if (!result.success) {
-        setError(result.message || 'Erro ao atualizar prato');
+        setErrorUpdate(result.message || 'Erro ao atualizar prato');
         alert(`Erro: ${result.message}`);
       } else {
-        alert('Prato atualizado com sucesso!');
+        setSuccess('Prato atualizado com sucesso!');
         setPratoSelecionado(null);
       }
     } catch {
+      setErrorUpdate('Erro inesperado ao atualizar prato');
       setError('Erro inesperado ao atualizar prato');
-      alert('Erro inesperado ao atualizar prato');
     } finally {
       setIsSubmitting(false);
     }
@@ -97,12 +100,12 @@ function CardapioAdmin() {
       try {
         const result = await deletePlate(id);
         if (!result.success) {
-          alert(`Erro: ${result.message}`);
+          setError(`Erro: ${result.message}`);
         } else {
-          alert('Prato excluído com sucesso!');
+          setSuccess('Prato excluído com sucesso!');
         }
       } catch {
-        alert('Erro ao excluir prato');
+        setError('Erro ao excluir prato');
       }
     }
   };
@@ -122,8 +125,22 @@ function CardapioAdmin() {
           <FiLogOut size={24} />
         </button>
       </nav>
+            {error && (
+                    <MessageBox
+                      message= {error}
+                      type="error"
+                      onClose={() => setError(false)}
+                    />
+                  )}
+                  {success && (
+                    <MessageBox
+                      message= {success}
+                      type="success"
+                      onClose={() => setSuccess(false)}
+                    />
+                  )}
 
-      {error && <p className="error">{error}</p>}
+      {errorUpdate && <p className="error">{errorUpdate}</p>}
       {platesLoading ? (
         <p className="loading">Carregando pratos...</p>
       ) : platesList.length === 0 ? (

@@ -6,9 +6,9 @@ import { MdRestaurantMenu } from 'react-icons/md';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
 import useUsersServices from '../../services/users';
-//import usePlatesServices from '../../hooks/usePlatesServices';
 import PlatesServices from '../../services/plates';
-import useOrderServices from '../../services/order';
+import OrderServices from '../../services/orders';
+import MessageBox from '../../components/message/message';
 
 const statusMap = {
   Pending: "Preparando",
@@ -26,7 +26,7 @@ const statusOptions = [
 
 function AdminPage() {
   const { isAuthenticated, logout, token, user } = useAuth();
-  const { orderLoading, refetchOrders, ordersList, getAllOrders, deleteOrder, updateOrder, setRefetchOrders } = useOrderServices();
+  const { orderLoading, refetchOrders, ordersList, getAllOrders, deleteOrder, updateOrder, setRefetchOrders, updateOrderStatus } = OrderServices();
   const navigate = useNavigate();
 
   const {
@@ -43,6 +43,8 @@ function AdminPage() {
   
   const [orders, setOrders] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [success, setSuccess] = useState('');
+  const [error, setError] = useState('');
 
   // Estados para formulário de prato
   const [nome, setNome] = useState('');
@@ -59,24 +61,6 @@ function AdminPage() {
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
-
-  // Atualizar status do pedido
-  const updateOrderStatus = async (orderId, newStatus) => {
-    try {
-      await fetch(`http://localhost:3000/orders/${orderId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ pickupStatus: newStatus })
-      });
-      setRefetchPlates(true);
-      setRefetchOrders(true);
-    } catch {
-      alert('Erro ao atualizar status do pedido');
-    }
-  };
 
   // Estados para trocar senha
   const [passwordForm, setPasswordForm] = useState({
@@ -144,10 +128,10 @@ function AdminPage() {
     const result = await changePassword(user._id, { oldPassword, newPassword });
 
     if (result.success) {
-      alert('Senha alterada com sucesso!');
+      setSuccess('Senha alterada com sucesso!');
       setPasswordForm({ oldPassword: '', newPassword: '', confirmNewPassword: '' });
     } else {
-      alert(`Erro ao alterar senha: ${result.error || 'Erro desconhecido'}`);
+      setError(`Erro ao alterar senha: ${result.error || 'Erro desconhecido'}`);
     }
   };
 
@@ -167,7 +151,7 @@ function AdminPage() {
 
     const response = await addPlate(novoPrato);
     if (response.success) {
-      alert('Prato adicionado com sucesso!');
+      setSuccess('Prato adicionado com sucesso!');
       setNome('');
       setDescricao('');
       setPreco('');
@@ -176,7 +160,7 @@ function AdminPage() {
       setImgUrl('');
       setRefetchPlates(true);
     } else {
-      alert(`Erro ao adicionar prato: ${response.error || response.message}`);
+      setError(`Erro ao adicionar prato: ${response.error || response.message}`);
     }
   };
 
@@ -187,6 +171,20 @@ function AdminPage() {
 
   return (
     <div className="admin-page" style={{ backgroundImage: `url(${bgImage})` }}>
+      {error && (
+              <MessageBox
+                message= {error}
+                type="error"
+                onClose={() => setError(false)}
+              />
+            )}
+            {success && (
+              <MessageBox
+                message= {success}
+                type="success"
+                onClose={() => setSuccess(false)}
+              />
+            )}
       <header className="admin-header">
         <h1>Bem-vindo Administrador</h1>
       </header>
@@ -297,6 +295,7 @@ function AdminPage() {
                           onBlur={() => setEditStatusId(null)}
                           onChange={e => {
                             updateOrderStatus(order._id, e.target.value);
+                            
                             setEditStatusId(null);
                           }}
                           style={{ marginLeft: 8 }}

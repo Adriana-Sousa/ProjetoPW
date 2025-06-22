@@ -4,10 +4,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiHome, FiLock, FiKey } from 'react-icons/fi';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import MessageBox from '../../components/message/message';
 
 function Login() {
   const navigate = useNavigate();
-  const { login, user, authLoading, error, isAuthenticated, success, setSuccess } = useAuth();
+  const { login, user, authLoading, error, isAuthenticated, success, setSuccess, setError} = useAuth();
   const [feedeback, setFeedeback] = useState("");
   
 
@@ -55,7 +56,6 @@ function Login() {
 
     try {
       await login(formData);
-      console.log("aqui")
       // Navegação será tratada pelo useEffect quando isAuthenticated mudar
     } catch (err) {
       console.error('Erro no login:', err);
@@ -67,6 +67,13 @@ function Login() {
       className="login-page"
       style={{ backgroundImage: `url(${bgImage})` }}
     >
+      {error && (
+        <MessageBox
+          message= {error}
+          type="error"
+          onClose={() => setError(false)}
+        />
+      )}
       <div className="login-container">
         <div style={{ position: 'absolute', top: '20px', right: '10px' }}>
           <Link to="/">
@@ -74,7 +81,6 @@ function Login() {
           </Link>
         </div>
         <h1>LOGIN</h1>
-        {error && <p className="error">{error}</p>}
         {feedeback && <p className="error">{feedeback}</p>}
         {authLoading && <p className="loading">Carregando...</p>}
         <form onSubmit={handleSubmitForm}>

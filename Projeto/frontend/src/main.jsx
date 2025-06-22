@@ -5,6 +5,7 @@ import App from './App.jsx'
 import { CarrinhoProvider } from './context/carrinhoProvider.jsx';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from './context/authProvider.jsx';
+import { createBrowserRouter } from 'react-router-dom';
 import { FavoritesProvider } from './context/favoritesContext.jsx';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -13,10 +14,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         <CarrinhoProvider>
           <FavoritesProvider>
             <BrowserRouter>
-              <AppRoutes />
+              <App />
             </BrowserRouter>
           </FavoritesProvider>
         </CarrinhoProvider>
       </AuthProvider>
   </React.StrictMode>
-);
+)

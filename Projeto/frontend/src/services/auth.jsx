@@ -85,6 +85,8 @@ export default function AuthServices() {
     authLoading,
     error,
     success,
-    getAuthData
+    getAuthData, 
+    setSuccess, 
+    setError
   };
 }

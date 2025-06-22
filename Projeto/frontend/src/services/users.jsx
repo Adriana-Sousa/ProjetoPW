@@ -7,6 +7,7 @@ export default function useUsersServices() {
   const [refetchUsers, setRefetchUsers] = useState(true);
   const [usersList, setUsersList] = useState([]);
   const [error, setError] = useState('');
+  const [sucess, setSucess] = useState('');
   const { token } = useAuth();
 
   const baseUrl = 'http://localhost:3000/users';
@@ -125,5 +126,7 @@ export default function useUsersServices() {
     setRefetchUsers,
     usersList,
     error,
+    setError,
+  
   };
 }

@@ -39,6 +39,7 @@ function Cadastro() {
     e.preventDefault();
 
     if (!formData.fullname.trim()) {
+      setError("Informe o seu nome.")
       return;
     }
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {

@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import './logout.css';
-import bgImage from '../../assets/HOME.jpg';
+import bgImage from '../../assets/HOME.JPG';
 
 function Logout() {
   return (

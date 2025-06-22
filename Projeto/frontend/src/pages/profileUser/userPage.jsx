@@ -9,7 +9,8 @@ import { useAuth } from '../../hooks/useAuth';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useUsersServices from '../../services/users';
-import useOrderServices from '../../services/order';
+import OrderServices from '../../services/orders';
+import MessageBox from '../../components/message/message';
 
 const statusMap = {
   Pending: "Preparando",
@@ -22,10 +23,13 @@ function UserPage() {
   const { logout, user } = useAuth();
   const { carrinho } = useCarrinho();
   const { favoritos, removerFavorito, atualizarFavoritos, refetchFavorites, isFavorited } = useFavorites();
-  const { orderLoading, refetchOrders, ordersList, deleteOrder, updateOrder, setRefetchOrders, getUserOrders } = useOrderServices();
+  const { orderLoading, refetchOrders, ordersList, deleteOrder, updateOrder, setRefetchOrders, getUserOrders } = OrderServices();
   const [ultimasEscolhas, setUltimasEscolhas] = useState([]);
   const navigate = useNavigate();
   const { changePassword, usersLoading, error: usersError } = useUsersServices();
+  const [error, setError] = useState('');
+  const [ success, setSuccess] = useState('');
+  const {errors, setErrors} = useState('');
 
   // Estados para trocar senha
   const [passwordForm, setPasswordForm] = useState({
@@ -56,7 +60,8 @@ function UserPage() {
     const { oldPassword, newPassword, confirmNewPassword } = passwordForm;
 
     if (!oldPassword) {
-      errors.oldPassword = 'Senha antiga é obrigatória';
+      setErrors('Senha antiga é obrigatória');
+      return;
     }
     if (!newPassword) {
       errors.newPassword = 'Nova senha é obrigatória';
@@ -89,10 +94,10 @@ function UserPage() {
     const result = await changePassword(user._id, { oldPassword, newPassword });
 
     if (result.success) {
-      alert('Senha alterada com sucesso!');
+      setSuccess('Senha alterada com sucesso!');
       setPasswordForm({ oldPassword: '', newPassword: '', confirmNewPassword: '' });
     } else {
-      alert(`Erro ao alterar senha: ${result.error || 'Erro desconhecido'}`);
+      setError(`Erro ao alterar senha: ${result.error || 'Erro desconhecido'}`);
     }
   };
 
@@ -112,7 +117,6 @@ function UserPage() {
 
   return (
     <div className="user-page" style={{ backgroundImage: `url(${bgImage})` }}>
-      
 
       <div className="user-content">
       <div className="user-icons-links">
@@ -130,6 +134,21 @@ function UserPage() {
         </button>
       </div>
         <div className="user-header">
+                {error && (
+              <MessageBox
+                message= {error}
+                type="error"
+                onClose={() => setError(false)}
+              />
+            )}
+            {success && (
+              <MessageBox
+                message= {success}
+                type="success"
+                onClose={() => setSuccess(false)}
+              />
+            )}
+
           <h1>Olá, {user?.fullname || 'Usuário'}</h1>
         </div>
 

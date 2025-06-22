@@ -22,4 +22,3 @@ export function FavoritosProvider({ children }) {
     </FavoritosContext.Provider>
   );
 }
-

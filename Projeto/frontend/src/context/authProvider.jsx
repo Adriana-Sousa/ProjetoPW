@@ -9,7 +9,7 @@ export const AuthProvider = ({ children }) => {
   const [success, setSuccess] = useState(null);
 
     // Importando os serviços de autenticação
-  const { signup, login, logout, authLoading, error  } = AuthServices();
+  const { signup, login, logout, authLoading, error, setError } = AuthServices();
 
   useEffect(() => {
     const storedAuth = localStorage.getItem('auth');
@@ -76,6 +76,7 @@ export const AuthProvider = ({ children }) => {
     login: handleLogin,
     signup: handleSignup,
     logout: handleLogout,
+    setError
 
   };
 

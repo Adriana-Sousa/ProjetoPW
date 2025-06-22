@@ -14,7 +14,7 @@ const isValidDate = (date) => /^\d{4}-\d{2}-\d{2}$/.test(date);
 const validPickupStatuses = ['Pendente', 'Preparando', 'Entregue', 'Cancelado'];
 const isValidPickupStatus = (status) => validPickupStatuses.includes(status);
 
-export default function useOrderServices() {
+export default function OrderServices() {
   const [orderLoading, setOrderLoading] = useState(false);
   const [refetchOrders, setRefetchOrders] = useState(true);
   const [ordersList, setOrdersList] = useState([]);
@@ -80,6 +80,22 @@ export default function useOrderServices() {
     }
     return result;
   };
+
+  const updateOrderStatus = async (orderId, newStatus) => {
+      try {
+        await fetch(`http://localhost:3000/orders/${orderId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({ pickupStatus: newStatus })
+        });
+        setRefetchOrders(true);
+      } catch {
+        alert('Erro ao atualizar status do pedido');
+      }
+    };
 
   // Validar orderData
   const validateOrderData = (orderData, isUpdate = false) => {
@@ -190,5 +206,6 @@ export default function useOrderServices() {
     sendOrder,
     deleteOrder,
     updateOrder,
+    updateOrderStatus
   };
 }

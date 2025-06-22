@@ -18,7 +18,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import CardapioAdmin from './pages/cardapio/cardapioAdmin.jsx';
 import Logout from './pages/logout/logout.jsx';
 
-function AppRoutes() {
+function App() {
   return (
   <Layout>
     <Routes>
@@ -41,4 +41,4 @@ function AppRoutes() {
 )
 }
 
-export default AppRoutes;
+export default App;

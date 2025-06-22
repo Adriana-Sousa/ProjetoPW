@@ -1,67 +1,85 @@
 [
     {
-        "name": "Cupcake de Milho com Coco",
-        "price": 4.99,
-        "available": true,
-        "description": "Delicioso cupcake feito com farinha de milho e coco ralado, com uma textura macia e um sabor doce e tropical que encanta!",
-        "ingredients": ["Farinha de milho", "Coco ralado", "Açúcar", "Ovos", "Leite de coco"],
-        "imgUrl": "/imgs/plates/doce.JPG",
-        "category": "Sobremesa"
-    },
-
-    {
-        "name": "Mousse de Maracujá",
-        "price": 6.99,
-        "available": true,
-        "description": "Uma sobremesa leve e refrescante feita com suco natural de maracujá, perfeita para fechar a refeição com um toque tropical!",
-        "ingredients": ["Suco de maracujá", "Leite condensado", "Creme de leite"],
-        "imgUrl": "/imgs/plates/mousse.jpg",
-        "category": "Sobremesa"
+        "name":"Squid Stew with Peas",
+        "price":10.99,
+        "available":false,
+        "description":"Fresh squid slowly cooked in a stew with fresh peas and tomatoes reveal an explosion of flavors that will make you come back for another bite!",
+        "ingredients":["Fresh squid","Fresh peas","Tomatoes"],
+        "imgUrl":"/imgs/plates/squidStewwithPeas.png",
+        "category":"First"
     },
     {
-        "name": "Carne de Sol na Nata",
-        "price": 18.50,
-        "available": true,
-        "description": "Carne de sol suculenta servida com um cremoso molho de nata, acompanhada de sabores regionais que encantam o paladar!",
-        "ingredients": ["Carne de sol", "Nata", "Cebola", "Manteiga"],
-        "imgUrl": "/imgs/plates/carne_sol.jpg",
-        "category": "Principal"
+        "name":"Tortellini in Chicken Broth",
+        "price": 8.99,
+        "available":true,
+        "description":"Our homemade tortellini, filled with meat, float in a warm chicken broth, bringing you the comfort and warmth of real Italian cuisine!",
+        "ingredients":["Homemade tortellini","Chicken broth"],
+        "imgUrl":"/imgs/plates/tortellini.png",
+        "category":"First"
     },
     {
-        "name": "Strogonoff de Carne de Sol",
-        "price": 16.99,
-        "available": true,
-        "description": "Clássico strogonoff com um toque nordestino, preparado com carne de sol desfiada e um molho cremoso irresistível!",
-        "ingredients": ["Carne de sol", "Creme de leite", "Molho de tomate", "Cebola", "Pimentão"],
-        "imgUrl": "/imgs/plates/strogonoff.jpg",
-        "category": "Principal"
-    },
-
-    {
-        "name": "Feijoada",
-        "price": 15.99,
-        "available": true,
-        "description": "Tradicional feijoada brasileira com feijão preto, carnes variadas e acompanhamentos que trazem o sabor autêntico do Brasil!",
-        "ingredients": ["Feijão preto", "Carnes variadas", "Laranja", "Couve", "Farinha"],
-        "imgUrl": "/imgs/plates/prato1.png",
-        "category": "Principal"
+        "name":"Shrimp and Vegetable Salad",
+        "price":10.99,
+        "available":true,
+        "description":"A fresh mixed salad with cooked shrimp, seasonal vegetables, and a secret dressing that will make your lunch or dinner shine!",
+        "ingredients":["Cooked shrimp","Seasonal vegetables","Salad dressing"],
+        "imgUrl":"/imgs/plates/shrimpandVegetableSalad.png",
+        "category":"Side"
     },
     {
-        "name": "Carne com Batata Frita",
-        "price": 12.50,
-        "available": true,
-        "description": "Uma suculenta carne acompanhada de batatas fritas crocantes, perfeitas para uma refeição rápida e saborosa!",
-        "ingredients": ["Carne bovina", "Batata frita", "Sal"],
-        "imgUrl": "/imgs/plates/prato3.png",
-        "category": "Principal"
+        "name":"Seafood Salad",
+        "price":7.99,
+        "available":true,
+        "description":"A fresh seafood salad with mixed seafood, dressed with the liquid gold of extra virgin olive oil, will take you on a taste journey you will always remember!",
+        "ingredients":["Mixed seafood","Extra virgin olive oil"],
+        "imgUrl":"/imgs/plates/seafoodSalad.png",
+        "category":"Appetizer"
     },
     {
-        "name": "Pão Integral",
-        "price": 2.99,
-        "available": true,
-        "description": "Pão integral fresco, preparado com grãos integrais, ideal para um café da manhã saudável ou acompanhamento leve!",
-        "ingredients": ["Farinha integral", "Fermento", "Água", "Sal"],
-        "imgUrl": "/imgs/plates/prato6.png",
-        "category": "Acompanhamento"
+        "name":"Lasagna Bolognese",
+        "price":11.99,
+        "available":true,
+        "description":"Layers of egg pasta interspersed with a rich minced meat sauce and a fluffy béchamel sauce. Lasagna Bolognese will make you feel at home!",
+        "ingredients":["Béchamel sauce","Minced meat sauce","Egg pasta","Basil"],
+        "imgUrl":"/imgs/plates/lasagna.png",
+        "category":"First"
+    },
+    {
+        "name":"Whole Grain Bread",
+        "price":5.99,
+        "available":true,
+        "description":"Freshly baked whole grain bread, crispy on the outside and soft on the inside, perfect to enjoy with every dish!",
+        "ingredients":["Whole grain flour","Water","Yeast","Salt"],
+        "imgUrl":"/imgs/plates/bread.png",
+        "category":"Other"
+    },
+    {
+        
+        "available":true,
+        "category":"Second",
+        "description":"Soft ground meatballs, immersed in a tomato and basil sauce, will make you say 'Mamma mia!' after every bite!",
+        "imgUrl":"/imgs/plates/meatBalls.png",
+        "ingredients":["Ground meat","Tomato sauce","Basil", "Butter"],
+        "name":"Meatballs in Tomato Sauce",
+        "price":11.99
+    },
+    {
+        
+        "price":8.99,
+        "description":"Smoked swordfish with seared vegetables and sesame seeds, a delightful combination of flavors!",
+        "category":"Appetizer",
+        "available":true,
+        "name":"Smoked Swordfish with Seared Vegetables",
+        "ingredients":["Smoked swordfish","Seared vegetables","Sesame seeds"],
+        "imgUrl":"/imgs/plates/swordfish.png"
+    },
+    {
+        "name":"Grilled Salmon",
+        "price":16.99,
+        "available":true,
+        "description":"A delicious grilled fresh salmon fillet, accompanied by a side of mixed vegetables that will make your palate happy!",
+        "ingredients":["Salmon fillet","Mixed vegetables"],
+        "imgUrl":"/imgs/plates/grilledSalmon.png",
+        "category":"Second"
     }
 ]

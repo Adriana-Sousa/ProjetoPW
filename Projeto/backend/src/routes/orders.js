@@ -2,7 +2,7 @@ import express from 'express';
 import OrdersControllers from '../controllers/orders.js';
 //import { isAdmin } from '../middleware/authMiddleware.js';
 import { serverError } from '../helpers/httpResponses.js';
-import { isAdmin } from '../middleware/authMiddleware.js';
+import { isAdmin, isAuthenticated } from '../middleware/authMiddleware.js';
 
 const ordersRouter = express.Router();
 const ordersControllers = new OrdersControllers();
@@ -17,7 +17,7 @@ ordersRouter.get('/',  isAdmin, async (req, res) => {
   }
 });
 
-ordersRouter.get('/user/:userId', async (req, res) => {
+ordersRouter.get('/user/:userId', isAuthenticated, async (req, res) => {
   try {
     const { body, success, statusCode } = await ordersControllers.getOrdersByUserId(req.params.userId);
     res.status(statusCode).send({ body, success, statusCode });
@@ -26,7 +26,7 @@ ordersRouter.get('/user/:userId', async (req, res) => {
   }
 });
 
-ordersRouter.post('/', async (req, res) => {
+ordersRouter.post('/', isAuthenticated, async (req, res) => {
   try {
     const { body, success, statusCode } = await ordersControllers.addOrder(req.body);
     res.status(statusCode).send({ body, success, statusCode });

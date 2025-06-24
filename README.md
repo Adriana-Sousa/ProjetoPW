@@ -37,3 +37,20 @@ Node.js: Para rodar o ambiente de desenvolvimento.
 HTML/CSS/JavaScript: Para estrutura, estilo e interatividade.
 
 Dependências: Instale via npm install (veja package.json no /frontend).
+
+## Como executar
+
+1. Clone o repositório:
+   ```bash
+   git clone https://github.com/Adriana-Sousa/ProjetoPW.git
+   ```
+2. Siga as instruções específicas de instalação e execução para o front-end e back-end nas respectivas pastas.
+3. Execute os comandos necessários para instalar as dependências e rodar o projeto.
+
+## Licença
+
+Este projeto está sob a licença MIT. Consulte o arquivo LICENSE para mais detalhes.
+
+---
+
+Desenvolvido por Adriana Sousa e Natalia Lima.

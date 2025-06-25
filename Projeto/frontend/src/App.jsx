@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom'
 import './App.css'
 import Layout from './components/layout/layout';
-//import Header from './components/header/header.jsx';
+import PedidosAdmin from './pages/pedidos/pedidosAdmin.jsx';
 import Footer from './components/footer/footer.jsx';
 import Home from './pages/home/home.jsx';
 import Carrinho from './pages/cart/cart.jsx';
@@ -31,6 +31,7 @@ function App() {
       <Route path="/login" element={<Login/>}/>
       <Route path="/cadastro" element={<Cadastro/>}/>
       <Route path="/admin" element={<ProtectedRoute allowedRole="admin"><Admin /></ProtectedRoute>} />
+      <Route path="/admin-pedidos" element={<ProtectedRoute allowedRole="admin"><PedidosAdmin /></ProtectedRoute>} />
       <Route path="/user-page" element={<ProtectedRoute allowedRole="client"><UserPage /></ProtectedRoute>} />
       <Route path="/loginadm" element={<LoginAdm/>}/>
       <Route path="/sem-autorizacao" element={<Unauthorized />} />

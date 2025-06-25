@@ -7,7 +7,7 @@ import { useAuth } from '../../hooks/useAuth';
 
 function Carrinho() {
   const { carrinho, removerItem, incrementarQuantidade, decrementarQuantidade, total, limparCarrinho } = useCarrinho();
-  const { user, token } = useAuth();
+  const { user, token, logout } = useAuth();
 
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const navigate = useNavigate();
@@ -54,6 +54,7 @@ const finalizarCompra = async () => {
 
   const sair = () => {
     setMostrarPopup(false);
+    logout();
     navigate('/');
   };
 

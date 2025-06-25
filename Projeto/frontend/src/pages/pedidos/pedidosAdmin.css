@@ -1,0 +1,233 @@
+.pedidos-admin-page {
+  min-height: 100vh;
+  width: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+  background-attachment: fixed;
+  color: #fff;
+  padding: 0;
+}
+
+.pedidos-admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(0,0,0,0.92);
+  padding: 2rem 2.5rem 1.5rem 2.5rem;
+  border-radius: 0 0 18px 18px;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.25);
+  margin-bottom: 2rem;
+}
+
+.pedidos-admin-header h1 {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #ffe6b0;
+  margin: 0;
+}
+
+.pedidos-admin-header-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  gap: 1.2rem;
+}
+
+.pedidos-admin-title {
+  color: #fff;
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin: 3.5rem 0 0.5rem 0; 
+  text-align: center;
+}
+
+.pedidos-admin-icons {
+  position: absolute;
+  right: 0;
+  top: 0;
+  display: flex;
+  gap: 1.2rem;
+  padding: 0.5rem 1.5rem 0 0;
+}
+
+.pedidos-admin-icon {
+  background: none;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: color 0.2s;
+  font-size: 1.5rem;
+  padding: 0.2rem;
+}
+
+.pedidos-admin-icon:hover {
+  color: var(--cor-destaque);
+}
+
+.pedidos-admin-content {
+  max-width: 700px;
+  margin: 0 auto;
+  background: rgba(0,0,0,0.85);
+  border-radius: 12px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+}
+
+.pedidos-admin-search {
+  margin-bottom: 1.5rem;
+  display: flex;
+  justify-content: center;
+}
+
+.pedidos-admin-search input {
+  width: 320px;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1.5px solid var(--cor-destaque);
+  background: #181818;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.pedidos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  padding: 0;
+  margin: 0;
+}
+
+.pedido-item {
+  background: #181818;
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  border: 1.5px solid var(--cor-destaque);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+  list-style: none;
+}
+
+.pedido-item:last-child {
+  margin-bottom: 0;
+}
+
+.pedido-item strong {
+  color: #ffe6b0;
+  font-weight: 600;
+}
+
+.pedido-item select {
+  margin-left: 0.5rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  border: 1px solid #ffe6b0;
+  background: #181818;
+  color: #ffe6b0;
+  font-size: 1rem;
+  outline: none;
+  transition: border 0.2s;
+}
+.pedido-item select:focus {
+  border: 1.5px solid #fff;
+}
+
+.pedido-info-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  font-size: 0.95rem;
+}
+
+.pedido-info-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.pedido-info-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 200px;
+}
+
+.pedido-status-block {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.pedido-status-select {
+  margin: 0;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  border: 1.5px solid var(--cor-destaque);
+  background: #232323;
+  color: #fff;
+  min-width: 140px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pedido-status-select:focus {
+  border-color: #fff;
+  box-shadow: 0 0 0 2px rgba(255, 230, 176, 0.3);
+}
+
+.pedido-status-select:hover {
+  background: #2a2a2a;
+}
+
+.pedido-status-text {
+  font-weight: 500;
+  color: var(--cor-destaque);
+  font-size: 0.85rem;
+}
+
+.pedido-itens {
+  margin-top: 0.5rem;
+}
+
+.pedido-itens-list {
+  margin: 0.5rem 0 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pedido-itens-list li {
+  margin-bottom: 0.3rem;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+}
+
+.pedido-item-nome {
+  font-weight: 500;
+  color: #fff;
+}
+
+.pedido-item-quantidade {
+  font-weight: bold;
+  margin-left: 0.5rem;
+  color: var(--cor-destaque);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 800px) {
+  .pedidos-admin-content {
+    padding: 1rem 0.5rem;
+  }
+  .pedidos-admin-header-row {
+    gap: 0.7rem;
+  }
+  .pedido-info-row {
+    grid-template-columns: 1fr;
+    gap: 0.7rem;
+  }
+}

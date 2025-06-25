@@ -6,7 +6,7 @@ export default function useFavoritesServices() {
   const [favoritesError, setFavoritesError] = useState('');
   const [favoritesList, setFavoritesList] = useState([]);
   const [refetchFavorites, setRefetchFavorites] = useState(true);
-  const { token, user } = useAuth();
+  const { token } = useAuth();
 
   const baseUrl = 'http://localhost:3000/favorites';
 
@@ -24,6 +24,15 @@ export default function useFavoritesServices() {
         ...options,
         headers: getHeaders(),
       });
+      
+      // Verificar se o servidor retornou HTML em vez de JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error(`Servidor retornou conteúdo não-JSON: ${contentType}`);
+        setFavoritesError('Servidor indisponível ou erro interno');
+        return { success: false, error: 'Servidor indisponível ou erro interno', statusCode: response.status };
+      }
+      
       const result = await response.json();
       console.log(`Resposta: ${options.method} ${url}`, { status: response.status, result });
       return {
@@ -34,8 +43,15 @@ export default function useFavoritesServices() {
       };
     } catch (err) {
       console.error(`Erro de rede: ${options.method} ${url}`, err.message);
-      setFavoritesError(err.message || 'Erro de conexão');
-      return { success: false, error: err.message, statusCode: 500 };
+      let errorMessage = err.message || 'Erro de conexão';
+      
+      // Detectar erro de JSON inválido
+      if (err.message.includes('Unexpected token') && err.message.includes('<!DOCTYPE')) {
+        errorMessage = 'Servidor backend não está respondendo corretamente. Verifique se está rodando.';
+      }
+      
+      setFavoritesError(errorMessage);
+      return { success: false, error: errorMessage, statusCode: 500 };
     } finally {
       setFavoritesLoading(false);
     }

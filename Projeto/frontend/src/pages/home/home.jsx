@@ -3,7 +3,6 @@ import './home.css';
 import bgImage from '../../assets/HOME.jpg';
 import { useAuth } from '../../hooks/useAuth';
 import AdminPage from '../admin/admin';
-//import Cardapio from '../cardapio/cardapioUser';
 import { useEffect, useState } from 'react';
 import CardapioUsuario from '../cardapio/cardapioUser';
 

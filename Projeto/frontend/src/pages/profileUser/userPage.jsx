@@ -22,14 +22,13 @@ const statusMap = {
 function UserPage() {
   const { logout, user } = useAuth();
   const { carrinho } = useCarrinho();
-  const { favoritos, removerFavorito, atualizarFavoritos, refetchFavorites, isFavorited } = useFavorites();
-  const { orderLoading, refetchOrders, ordersList, deleteOrder, updateOrder, setRefetchOrders, getUserOrders } = OrderServices();
+  const { favoritos, removerFavorito, atualizarFavoritos } = useFavorites();
+  const { orderLoading, refetchOrders, ordersList, getUserOrders } = OrderServices();
   const [ultimasEscolhas, setUltimasEscolhas] = useState([]);
   const navigate = useNavigate();
   const { changePassword, usersLoading, error: usersError } = useUsersServices();
   const [error, setError] = useState('');
-  const [ success, setSuccess] = useState('');
-  const {errors, setErrors} = useState('');
+  const [success, setSuccess] = useState('');
 
   // Estados para trocar senha
   const [passwordForm, setPasswordForm] = useState({
@@ -48,11 +47,11 @@ function UserPage() {
     setUltimasEscolhas(ultimos);
   }, [carrinho]);
 
-  useEffect(()=> {
-    if(refetchOrders){
+  useEffect(() => {
+    if (refetchOrders && user?._id) {
       getUserOrders(user._id);
     }
-  }, [refetchOrders]);
+  }, [refetchOrders, user?._id, getUserOrders]);
 
   // Validação da nova senha
   const validatePassword = () => {
@@ -60,14 +59,13 @@ function UserPage() {
     const { oldPassword, newPassword, confirmNewPassword } = passwordForm;
 
     if (!oldPassword) {
-      setErrors('Senha antiga é obrigatória');
-      return;
+      errors.oldPassword = 'Senha antiga é obrigatória';
     }
     if (!newPassword) {
       errors.newPassword = 'Nova senha é obrigatória';
     } else if (newPassword.length < 5) {
       errors.newPassword = 'A senha deve ter pelo menos 5 caracteres';
-    } 
+    }
     if (!confirmNewPassword) {
       errors.confirmNewPassword = 'Confirmação da senha é obrigatória';
     } else if (newPassword !== confirmNewPassword) {
@@ -117,37 +115,36 @@ function UserPage() {
 
   return (
     <div className="user-page" style={{ backgroundImage: `url(${bgImage})` }}>
-
       <div className="user-content">
-      <div className="user-icons-links">
-        <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
-          <FiHome size={20} />
-        </Link>
-        <Link to="/cart" className="user-icon-link" title="Carrinho">
-          <FiShoppingCart size={20} />
-        </Link>
-        <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
-          <MdRestaurantMenu size={20} />
-        </Link>
-        <button className="user-icon-link" title="Sair" onClick={handleLogout}>
-          <FiLogOut size={20} />
-        </button>
-      </div>
+        <div className="user-icons-links">
+          <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
+            <FiHome size={20} />
+          </Link>
+          <Link to="/cart" className="user-icon-link" title="Carrinho">
+            <FiShoppingCart size={20} />
+          </Link>
+          <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
+            <MdRestaurantMenu size={20} />
+          </Link>
+          <button className="user-icon-link" title="Sair" onClick={handleLogout}>
+            <FiLogOut size={20} />
+          </button>
+        </div>
         <div className="user-header">
-                {error && (
-              <MessageBox
-                message= {error}
-                type="error"
-                onClose={() => setError(false)}
-              />
-            )}
-            {success && (
-              <MessageBox
-                message= {success}
-                type="success"
-                onClose={() => setSuccess(false)}
-              />
-            )}
+          {error && (
+            <MessageBox
+              message={error}
+              type="error"
+              onClose={() => setError(false)}
+            />
+          )}
+          {success && (
+            <MessageBox
+              message={success}
+              type="success"
+              onClose={() => setSuccess(false)}
+            />
+          )}
 
           <h1>Olá, {user?.fullname || 'Usuário'}</h1>
         </div>
@@ -183,7 +180,7 @@ function UserPage() {
           )}
         </div>
 
-         <div className="user-section">
+        <div className="user-section">
           <h2>Pedidos Atuais</h2>
           {orderLoading ? (
             <p>Carregando pedidos...</p>

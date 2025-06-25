@@ -156,6 +156,30 @@ export function FavoritesProvider({ children }) {
     
   };
 
+  // Buscar favoritos do servidor
+  const buscarFavoritos = async () => {
+    if (!isAuthenticated || !user?._id) {
+      console.warn('FavoritesProvider: Usuário não autenticado');
+      return { success: false, error: 'Usuário não autenticado' };
+    }
+
+    try {
+      const result = await getFavorites();
+      if (result.success && result.data) {
+        saveFavoritesToStorage(result.data.plates || []);
+      } else if (!result.success && result.error) {
+        // Só mostrar erro se não for problema de autenticação
+        if (!result.error.includes('não autenticado') && !result.error.includes('unauthorized')) {
+          console.error('FavoritesProvider: Erro ao buscar favoritos:', result.error);
+        }
+      }
+      return result;
+    } catch (error) {
+      console.error('FavoritesProvider: Erro ao buscar favoritos:', error.message);
+      return { success: false, error: error.message };
+    }
+  };
+
   // Valor do contexto
   const value = {
     refetchFavorites,
@@ -163,6 +187,7 @@ export function FavoritesProvider({ children }) {
     toggleFavorito,
     removerFavorito,
     atualizarFavoritos,
+    getFavorites: buscarFavoritos,
     favoritesLoading,
     favoritesError,
     isFavorited: (plateId) => Array.isArray(favoritesList) && favoritesList.some((f) => f._id === plateId),

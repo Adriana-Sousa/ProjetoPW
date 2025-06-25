@@ -7,6 +7,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center;
+  background-attachment: fixed;
 }
 
 .cardapio-title {
@@ -159,41 +160,67 @@
 .favoritar-container {
   margin-top: 0.5rem;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .favoritar-button {
   margin-left: 12px;
-  padding: 0;
+  padding: 4px;
   display: flex;
   align-items: center;
-  background: transparent;
-  border: none;
-  outline: none;
+  justify-content: center;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
   cursor: pointer;
-  color: var(--cor-destaque);
   font-size: 1.2rem;
-  transition: transform 0.3s ease, color 0.3s ease;
+  transition: transform 0.2s ease;
+  border-radius: 50%;
 }
 
 .favoritar-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
-  color: var(--cor-destaque);
+  transform: scale(1.1);
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
 }
 
 .favoritar-button:focus {
-  outline: none;
-  box-shadow: none;
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.favoritar-button:active {
+  transform: scale(0.95);
+  outline: none !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.favoritar-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  background: transparent !important;
 }
 
 .favoritar-button svg {
-  color: #ccc;
   width: 24px;
   height: 24px;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.3));
+}
+
+.favoritar-button:hover svg {
+  transform: scale(1.05);
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
 }
 
 .favoritar-button.favoritado svg {
-  color: #e74c3c;
+  color: #e74c3c !important;
 }
 
 .admin-buttons {

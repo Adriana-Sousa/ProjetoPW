@@ -1,32 +1,24 @@
 import './admin.css';
 import bgImage from '../../assets/FOTOBASE.JPG';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiLogOut, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiLogOut, FiEye, FiEyeOff, FiTag, FiEdit2, FiDollarSign, FiList, FiImage } from 'react-icons/fi';
 import { MdRestaurantMenu } from 'react-icons/md';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import Select from 'react-select';
 import useUsersServices from '../../services/users';
 import PlatesServices from '../../services/plates';
-import OrderServices from '../../services/orders';
 import MessageBox from '../../components/message/message';
 
-const statusMap = {
-  Pending: "Preparando",
-  Ready: "Pronto para retirada",
-  Delivered: "Entregue",
-  Cancelled: "Cancelado"
-};
-
-const statusOptions = [
-  { value: "Pending", label: "Preparando" },
-  { value: "Ready", label: "Pronto para retirada" },
-  { value: "Delivered", label: "Entregue" },
-  { value: "Cancelled", label: "Cancelado" }
+const categoriaOptions = [
+  { value: 'entrada', label: 'Entrada' },
+  { value: 'principal', label: 'Prato Principal' },
+  { value: 'sobremesa', label: 'Sobremesa' },
+  { value: 'bebida', label: 'Bebida' }
 ];
 
 function AdminPage() {
-  const { isAuthenticated, logout, token, user } = useAuth();
-  const { orderLoading, refetchOrders, ordersList, getAllOrders, deleteOrder, updateOrder, setRefetchOrders, updateOrderStatus } = OrderServices();
+  const { isAuthenticated, logout, user } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -40,9 +32,7 @@ function AdminPage() {
 
   // mudar senha
   const { changePassword, usersLoading, error: usersError } = useUsersServices();
-  
-  const [orders, setOrders] = useState([]);
-  const [ordersLoading, setOrdersLoading] = useState(false);
+
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
 
@@ -53,9 +43,6 @@ function AdminPage() {
   const [categoria, setCategoria] = useState('sobremesa');
   const [ingredientes, setIngredientes] = useState('');
   const [imgUrl, setImgUrl] = useState('');
-
-  // Estado para edição de status do pedido
-  const [editStatusId, setEditStatusId] = useState(null);
 
   // Estados para mostrar/esconder senha
   const [showOldPassword, setShowOldPassword] = useState(false);
@@ -70,8 +57,6 @@ function AdminPage() {
   });
   const [passwordErrors, setPasswordErrors] = useState({});
 
-  
-
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/login');
@@ -82,12 +67,7 @@ function AdminPage() {
       getPlates().catch(() => alert('Erro ao carregar pratos'));
       setRefetchPlates(false);
     }
-
-    if(refetchOrders) {
-      getAllOrders();
-    }
-
-  }, [isAuthenticated, navigate, refetchPlates, token, getPlates, setRefetchPlates, refetchOrders]);
+  }, [isAuthenticated, navigate, refetchPlates, getPlates, setRefetchPlates]);
 
   // Validação da nova senha
   const validatePassword = () => {
@@ -101,7 +81,7 @@ function AdminPage() {
       errors.newPassword = 'Nova senha é obrigatória';
     } else if (newPassword.length < 5) {
       errors.newPassword = 'A senha deve ter pelo menos 5 caracteres';
-    } 
+    }
     if (!confirmNewPassword) {
       errors.confirmNewPassword = 'Confirmação da senha é obrigatória';
     } else if (newPassword !== confirmNewPassword) {
@@ -172,29 +152,36 @@ function AdminPage() {
   return (
     <div className="admin-page" style={{ backgroundImage: `url(${bgImage})` }}>
       {error && (
-              <MessageBox
-                message= {error}
-                type="error"
-                onClose={() => setError(false)}
-              />
-            )}
-            {success && (
-              <MessageBox
-                message= {success}
-                type="success"
-                onClose={() => setSuccess(false)}
-              />
-            )}
+        <MessageBox
+          message={error}
+          type="error"
+          onClose={() => setError(false)}
+        />
+      )}
+      {success && (
+        <MessageBox
+          message={success}
+          type="success"
+          onClose={() => setSuccess(false)}
+        />
+      )}
       <header className="admin-header">
         <h1>Bem-vindo Administrador</h1>
       </header>
-
       <div className="admin-content">
+        <section className="admin-section">
+          <h2>Gerenciamento de Pedidos</h2>
+          <button
+            className="admin-pedidos-btn"
+            onClick={() => navigate('/admin-pedidos')}
+          >
+            Ir para pedidos
+          </button>
+        </section>
         <section className="admin-section">
           <h2>Total de Pratos</h2>
           <p>{platesLoading ? 'Carregando...' : `${platesList.length} pratos cadastrados.`}</p>
         </section>
-
         <section className="admin-section">
           <h2>Últimos Registros Adicionados</h2>
           <ul>
@@ -205,54 +192,108 @@ function AdminPage() {
             ))}
           </ul>
         </section>
-
         <section className="admin-section">
           <h2>Adicionar Novo Prato</h2>
           <form onSubmit={handleSubmit} className="adicionar-prato-form">
-            <input
-              type="text"
-              placeholder="Nome do prato"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-              required
-            />
-            <input
-              type="text"
-              placeholder="Descrição"
-              value={descricao}
-              onChange={(e) => setDescricao(e.target.value)}
-              required
-            />
-            <input
-              type="number"
-              step="0.01"
-              placeholder="Preço"
-              value={preco}
-              onChange={(e) => setPreco(e.target.value)}
-              required
-            />
-            <select
-              value={categoria}
-              onChange={(e) => setCategoria(e.target.value)}
-              required
-            >
-              <option value="entrada">Entrada</option>
-              <option value="principal">Prato Principal</option>
-              <option value="sobremesa">Sobremesa</option>
-              <option value="bebida">Bebida</option>
-            </select>
-            <input
-              type="text"
-              placeholder="Ingredientes (separados por vírgula)"
-              value={ingredientes}
-              onChange={(e) => setIngredientes(e.target.value)}
-            />
-            <input
-              type="text"
-              placeholder="URL da Imagem"
-              value={imgUrl}
-              onChange={(e) => setImgUrl(e.target.value)}
-            />
+            <div className="input-icon-group">
+              <FiTag className="input-icon" />
+              <input
+                type="text"
+                placeholder="Nome do prato"
+                value={nome}
+                onChange={(e) => setNome(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-icon-group">
+              <FiEdit2 className="input-icon" />
+              <input
+                type="text"
+                placeholder="Descrição"
+                value={descricao}
+                onChange={(e) => setDescricao(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-icon-group">
+              <FiDollarSign className="input-icon" />
+              <input
+                type="number"
+                step="0.01"
+                placeholder="Preço"
+                value={preco}
+                onChange={(e) => setPreco(e.target.value)}
+                required
+              />
+            </div>
+            <div className="input-icon-group">
+              <FiList className="input-icon" />
+              <input
+                type="text"
+                placeholder="Ingredientes (separados por vírgula)"
+                value={ingredientes}
+                onChange={(e) => setIngredientes(e.target.value)}
+              />
+            </div>
+            <div className="input-icon-group">
+              <FiImage className="input-icon" />
+              <input
+                type="text"
+                placeholder="URL da Imagem"
+                value={imgUrl}
+                onChange={(e) => setImgUrl(e.target.value)}
+              />
+            </div>
+            <div style={{ marginTop: '0.5rem', marginBottom: '0.5rem' }}>
+              <Select
+                options={categoriaOptions}
+                value={categoriaOptions.find(opt => opt.value === categoria)}
+                onChange={opt => setCategoria(opt.value)}
+                placeholder="Selecione a categoria"
+                isSearchable={false}
+                styles={{
+                  control: (base) => ({
+                    ...base,
+                    background: '#181818',
+                    borderColor: '#ffe6b0',
+                    color: '#fff',
+                    borderRadius: 6,
+                    boxShadow: 'none',
+                    minHeight: '38px',
+                    '&:hover': {
+                      borderColor: '#ffe6b0',
+                    }
+                  }),
+                  singleValue: (base) => ({
+                    ...base,
+                    color: '#fff'
+                  }),
+                  menu: (base) => ({
+                    ...base,
+                    background: '#181818',
+                    color: '#fff'
+                  }),
+                  option: (base, state) => ({
+                    ...base,
+                    background: state.isFocused ? '#ffe6b0' : '#181818',
+                    color: state.isFocused ? '#181818' : '#fff',
+                    cursor: 'pointer'
+                  }),
+                  placeholder: (base) => ({
+                    ...base,
+                    color: '#ffe6b0'
+                  }),
+                  dropdownIndicator: (base) => ({
+                    ...base,
+                    color: '#ffe6b0'
+                  }),
+                  indicatorSeparator: (base) => ({
+                    ...base,
+                    background: '#ffe6b0'
+                  })
+                }}
+              />
+            </div>
             <button
               type="submit"
               className="admin-button"
@@ -262,137 +303,11 @@ function AdminPage() {
             </button>
           </form>
         </section>
-
-        {/* PEDIDOS DOS CLIENTES */}
-        <section className="admin-section">
-          <h2>Pedidos dos Clientes</h2>
-          {orderLoading ? (
-            <p>Carregando pedidos...</p>
-          ) : ordersList.length === 0 ? (
-            <p>Nenhum pedido encontrado.</p>
-          ) : (
-            <div className="pedidos-lista">
-              {ordersList.map((order) => (
-                <div key={order._id} className="pedido-card">
-                  <div className="pedido-info">
-                    <span>
-                      <strong>Cliente:</strong>{' '}
-                      {order.userDetails?.[0]?.fullname || 'Desconhecido'}
-                    </span>
-                    <span>
-                      <strong>Data:</strong>{' '}
-                      {order.createdAt
-                        ? new Date(order.createdAt).toLocaleString()
-                        : '---'}
-                    </span>
-                    <span>
-                      <strong>Status:</strong> {statusMap[order.pickupStatus] || order.pickupStatus || '---'}
-                      {editStatusId === order._id ? (
-                        <select
-                          className="status-select"
-                          value={order.pickupStatus}
-                          autoFocus
-                          onBlur={() => setEditStatusId(null)}
-                          onChange={e => {
-                            updateOrderStatus(order._id, e.target.value);
-                            
-                            setEditStatusId(null);
-                          }}
-                          style={{ marginLeft: 8 }}
-                        >
-                          {statusOptions.map(opt => (
-                            <option key={opt.value} value={opt.value}>{opt.label}</option>
-                          ))}
-                        </select>
-                      ) : (
-                        <button
-                          className="status-edit-btn"
-                          onClick={() => setEditStatusId(order._id)}
-                          style={{ marginLeft: 8 }}
-                          type="button"
-                        >
-                          Alterar
-                        </button>
-                      )}
-                    </span>
-                  </div>
-                  <div className="pedido-itens">
-                    <strong>Itens:</strong>
-                    <ul>
-                      {order.orderItems?.map((item, idx) => (
-                        <li key={idx}>
-                          {item.name} <b>x{item.quantidade}</b>{' '}
-                          <span>- R$ {Number(item.preco).toFixed(2)}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div className="pedido-total">
-                    <strong>Total:</strong> R${' '}
-                    {order.orderItems
-                      ? order.orderItems
-                          .reduce(
-                            (acc, item) =>
-                              acc + item.preco * item.quantidade,
-                            0
-                          )
-                          .toFixed(2)
-                      : '0.00'}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </section>
-
-        {/* CONTROLE DE PEDIDOS / HISTÓRICO */}
-        <section className="admin-section">
-          <h2>Controle de Pedidos</h2>
-          {orderLoading ? (
-            <p>Carregando histórico...</p>
-          ) : (
-            <div className="pedidos-lista">
-              {ordersList
-                .filter(order =>
-                  order.pickupStatus === "Delivered" || order.pickupStatus === "Cancelled"
-                )
-                .map((order) => (
-                  <div key={order._id} className="pedido-card">
-                    <div className="pedido-info">
-                      <span>
-                        <strong>Cliente:</strong> {order.userDetails?.[0]?.fullname || 'Desconhecido'}
-                      </span>
-                      <span>
-                        <strong>Status:</strong> {statusMap[order.pickupStatus] || order.pickupStatus}
-                      </span>
-                    </div>
-                    <div className="pedido-itens">
-                      <strong>Itens:</strong>
-                      <ul>
-                        {order.orderItems?.map((item, idx) => (
-                          <li key={idx}>
-                            {item.name} <b>x{item.quantidade}</b>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                ))}
-              {/* Se não houver pedidos entregues/cancelados */}
-              {ordersList.filter(order =>
-                order.pickupStatus === "Delivered" || order.pickupStatus === "Cancelled"
-              ).length === 0 && (
-                <p>Nenhum pedido entregue ou cancelado.</p>
-              )}
-            </div>
-          )}
-        </section>
-
         <section className="admin-section">
           <h2>Trocar Senha</h2>
           {usersError && <p className="error" role="alert">{usersError}</p>}
           <form onSubmit={handlePasswordSubmit} className="trocar-senha-form">
-            <div className="form-group" style={{ position: 'relative' }}>
+            <div className="form-group">
               <input
                 type={showOldPassword ? "text" : "password"}
                 name="oldPassword"
@@ -416,7 +331,7 @@ function AdminPage() {
                 {showOldPassword ? <FiEyeOff /> : <FiEye />}
               </button>
               {passwordErrors.oldPassword && (
-                <span id="oldPassword-error" className="error-text">
+                <span className="error-text">
                   {passwordErrors.oldPassword}
                 </span>
               )}
@@ -489,7 +404,6 @@ function AdminPage() {
             </button>
           </form>
         </section>
-
         <div className="admin-icons-links">
           <Link to="/cardapio-admin" className="admin-icon-link" title="Área de Cardápio">
             <MdRestaurantMenu size={24} />

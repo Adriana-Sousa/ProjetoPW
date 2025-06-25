@@ -120,7 +120,7 @@ const handleStatusChange = (orderId, newStatus) => {
                   <div className="pedido-info-row">
                     <div className="pedido-info-item">
                       <strong>Cliente:</strong> 
-                      <span>{pedido.userFullname || pedido.user?.fullname || 'Desconhecido'}</span>
+                      <span>{ pedido.userDetails?.[0]?.fullname || 'Desconhecido'}</span>
                     </div>
                     <div className="pedido-info-item">
                       <strong>Data:</strong> 

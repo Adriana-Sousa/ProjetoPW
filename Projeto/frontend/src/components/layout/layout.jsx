@@ -5,7 +5,7 @@ const Layout = ({ children }) => {
   const location = useLocation();
   
   // rotas sem navbar
-  const noNavbarRoutes = ['/', '/login', '/cadastro', '/admin', '/loginadm', '/cardapio-user', '/cart', '/cardapio-publico', '/cardapio-admin', '/user-page', '/logout'];
+  const noNavbarRoutes = ['/', '/login', '/cadastro', '/admin', '/loginadm', '/cardapio-user', '/cart', '/cardapio-publico', '/cardapio-admin', '/user-page', '/logout', '/admin/pedidos'];
 
   const shouldShowNavbar = !noNavbarRoutes.includes(location.pathname);
 

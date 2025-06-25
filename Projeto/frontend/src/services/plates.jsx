@@ -1,5 +1,5 @@
 // src/services/usePlatesServices.js
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 //import { useAuth } from '../context/authContext';
 import { useAuth } from '../hooks/useAuth';
 
@@ -11,10 +11,10 @@ export default function PlatesServices() {
 
   const baseUrl = 'http://localhost:3000/plates';
 
-  const getHeaders = useCallback(() => ({
+  const getHeaders = () => ({
     'Content-Type': 'application/json',
-     ...(token && { Authorization: `Bearer ${token}` }),
-    }), [token]);
+    ...(token && { Authorization: `Bearer ${token}` }),
+  });
 
   // Listar pratos disponíveis
   const getAvailablePlates = async () => {
@@ -44,7 +44,7 @@ export default function PlatesServices() {
   };
 
   // Listar todos os pratos
-  const getPlates = useCallback(async () => {
+  const getPlates = async () => {
     setPlatesLoading(true);
     try {
       const response = await fetch(baseUrl, {
@@ -53,22 +53,22 @@ export default function PlatesServices() {
       });
       const result = await response.json();
       if (response.ok && result.success) {
-         setPlatesList(result.body);
+        setPlatesList(result.body);
         return { success: true, data: result.body };
       } else {
-          return {
-            success: false,
-            message: result.body?.message || 'Erro ao buscar pratos',
-            status: response.status,
-          };
-        }
+        return {
+          success: false,
+          message: result.body?.message || 'Erro ao buscar pratos',
+          status: response.status,
+        };
+      }
     } catch (error) {
       return { success: false, message: error.message, status: 500 };
     } finally {
       setPlatesLoading(false);
       setRefetchPlates(false);
     }
-  }, [getHeaders]);
+  };
 
   // Adicionar um novo prato
   const addPlate = async (formData) => {
@@ -82,10 +82,6 @@ export default function PlatesServices() {
     if (category && !['entrada', 'principal', 'sobremesa', 'bebida'].includes(category)) {
       return { success: false, message: 'Categoria inválida' };
     }
-    if (!description || !imgUrl) {
-        return { success: false, message: 'Descrição e imagem são obrigatórias.' };
-    }
-    
     setPlatesLoading(true);
     try {
       const response = await fetch(baseUrl, {

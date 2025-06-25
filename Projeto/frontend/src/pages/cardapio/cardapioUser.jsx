@@ -14,28 +14,19 @@ function CardapioUsuario() {
   const [pratoSelecionado, setPratoSelecionado] = useState(null);
   const [busca, setBusca] = useState('');
   const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
-  const {toggleFavorito, favoritesLoading, favoritesError, isFavorited, atualizarFavoritos, getFavorites } = useFavorites();
+  const { favoritos, toggleFavorito, favoritesLoading, favoritesError, isFavorited , atualizarFavoritos} = useFavorites();
   const navigate = useNavigate();
   const { carrinho, adicionarAoCarrinho, limparCarrinho } = useCarrinho();
   const { getAvailablePlates, platesList, platesLoading, refetchPlates } = usePlatesServices();
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated, user } = useAuth();
 
   useEffect(() => {
+    
     if (refetchPlates) {
       getAvailablePlates().catch(() => alert('Erro ao carregar pratos'));
+      
     }
-  }, [getAvailablePlates, refetchPlates]);
-
-  useEffect(() => {
-    // Só buscar favoritos se o usuário estiver realmente autenticado
-    if (refetchPlates && isAuthenticated) {
-      getFavorites().catch((error) => {
-        console.error('Erro ao carregar favoritos:', error);
-        // Não mostrar alert para erros de favoritos, apenas log
-      }); 
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetchPlates, getFavorites]);
+  }, [ getAvailablePlates, refetchPlates]);
 
   const abrirModal = (prato) => setPratoSelecionado(prato);
   const fecharModal = () => setPratoSelecionado(null);
@@ -84,6 +75,7 @@ function CardapioUsuario() {
             />
             {carrinho.length > 0 && <span className="carrinho-count">{carrinho.length}</span>}
           </div>
+           {/* Botão de logout */}
           <button
             className="logout-btn"
             onClick={handleLogout}
@@ -115,24 +107,25 @@ function CardapioUsuario() {
                       <span className="carrinho-qtd">x{item.quantidade || 1}</span>
                     </div>
                   ))}
+
                 </div>
                 <div className="carrinho-link-container">
                   <button
-                    className="carrinho-esvaziar-btn"
-                    onClick={limparCarrinho}
-                    type="button"
-                  >
-                    Esvaziar
-                  </button>
-                  <div className="carrinho-link-right">
-                    <span className="carrinho-total-qtd">
-                      Total: {carrinho.reduce((acc, item) => acc + (item.quantidade || 1), 0)} itens
-                    </span>
-                    <Link to="/cart" className="ir-para-carrinho">
-                      Ir para o Carrinho →
-                    </Link>
-                  </div>
+                  className="carrinho-esvaziar-btn"
+                  onClick={limparCarrinho}
+                  type="button"
+                >
+                  Esvaziar
+                </button>
+                <div className="carrinho-link-right">
+                  <span className="carrinho-total-qtd">
+                    Total: {carrinho.reduce((acc, item) => acc + (item.quantidade || 1), 0)} itens
+                  </span>
+                  <Link to="/cart" className="ir-para-carrinho">
+                    Ir para o Carrinho →
+                  </Link>
                 </div>
+              </div>
               </div>
             )}
           </div>
@@ -183,7 +176,7 @@ function CardapioUsuario() {
               <strong>R$ {pratoSelecionado.price.toFixed(2)}</strong>
             </p>
             <div className="modal-buttons">
-              <button onClick={() => { adicionarAoCarrinho(pratoSelecionado); fecharModal(); }}>Adicionar ao carrinho</button>
+               <button onClick={() => { adicionarAoCarrinho(pratoSelecionado); fecharModal(); }}>Adicionar ao carrinho</button>
               <button onClick={fecharModal}>Fechar</button>
             </div>
           </div>

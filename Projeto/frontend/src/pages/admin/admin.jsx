@@ -173,7 +173,7 @@ function AdminPage() {
           <h2>Gerenciamento de Pedidos</h2>
           <button
             className="admin-pedidos-btn"
-            onClick={() => navigate('/admin-pedidos')}
+            onClick={() => navigate('/admin/pedidos')}
           >
             Ir para pedidos
           </button>

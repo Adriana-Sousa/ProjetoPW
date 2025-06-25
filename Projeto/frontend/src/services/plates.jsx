@@ -82,6 +82,10 @@ export default function PlatesServices() {
     if (category && !['entrada', 'principal', 'sobremesa', 'bebida'].includes(category)) {
       return { success: false, message: 'Categoria inválida' };
     }
+
+    if (!description || !imgUrl) {
+        return { success: false, message: 'Descrição e imagem são obrigatórias.' };
+    }
     setPlatesLoading(true);
     try {
       const response = await fetch(baseUrl, {

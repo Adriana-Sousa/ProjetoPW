@@ -19,59 +19,35 @@ function PedidosAdmin() {
   const { logout, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const [pending, setPending] = useState(false);
   const {
-  ordersList,
-  orderLoading,
-  getAllOrders,
-  updateOrderStatus,
-  error: ordersError,
-  refetchOrders,
-} = OrderServices();
+    ordersList,
+    orderLoading,
+    getAllOrders,
+    updateOrderStatus,
+    error: ordersError,
+    refetchOrders,
+  } = OrderServices();
 
-useEffect(() => {
-  if (isAuthenticated === false) {
-    navigate('/login');
-    return;
-  }
-  if (isAuthenticated === true) {
-    getAllOrders();
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [isAuthenticated, navigate]);
+  useEffect(() => {
+    if (isAuthenticated && refetchOrders) {
+      getAllOrders();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, refetchOrders]);
 
-useEffect(() => {
-  if (isAuthenticated && refetchOrders) {
-    getAllOrders();
-  }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-}, [isAuthenticated, refetchOrders]);
-
-const handleStatusChange = (orderId, newStatus) => {
-  updateOrderStatus(orderId, newStatus);
-};
+  const handleStatusChange = (orderId, newStatus) => {
+    updateOrderStatus(orderId, newStatus);
+  };
 
   const pedidosFiltrados = ordersList.filter((pedido) => {
     const cliente = String(pedido.userFullname || pedido.user?.fullname || '').toLowerCase();
     const itens = Array.isArray(pedido.orderItems)
       ? pedido.orderItems.map(i => (i?.name || '').toLowerCase()).join(' ')
       : '';
-    return (
-      cliente.includes(search.toLowerCase()) ||
-      itens.includes(search.toLowerCase())
-    );
+    const matchesSearch = cliente.includes(search.toLowerCase()) || itens.includes(search.toLowerCase());
+    return pending ? matchesSearch && pedido.pickupStatus === 'Pending' : matchesSearch;
   });
-
-  // Mostra loading enquanto autenticação está indefinida
-  if (isAuthenticated === undefined || isAuthenticated === null) {
-    return (
-      <div className="pedidos-admin-page" style={{ backgroundImage: `url(${bgImage})` }}>
-        <div className="pedidos-admin-header-row">
-          <h1 className="pedidos-admin-title">Gerenciamento de Pedidos</h1>
-        </div>
-        <div style={{ color: "#fff", textAlign: "center", marginTop: "2rem" }}>Carregando...</div>
-      </div>
-    );
-  }
 
   return (
     <div className="pedidos-admin-page" style={{ backgroundImage: `url(${bgImage})` }}>
@@ -99,6 +75,15 @@ const handleStatusChange = (orderId, newStatus) => {
         />
       </div>
 
+      <div className="pedidos-admin-filter">
+        <button
+          className={`pedidos-admin-filter-btn ${pending ? 'active' : ''}`}
+          onClick={() => setPending(!pending)}
+        >
+          {pending ? 'Mostrar Todos' : 'Mostrar Apenas Pendentes'}
+        </button>
+      </div>
+
       {ordersError && (
         <MessageBox
           message={ordersError}
@@ -120,7 +105,7 @@ const handleStatusChange = (orderId, newStatus) => {
                   <div className="pedido-info-row">
                     <div className="pedido-info-item">
                       <strong>Cliente:</strong> 
-                      <span>{ pedido.userDetails?.[0]?.fullname || 'Desconhecido'}</span>
+                      <span>{pedido.userDetails?.[0]?.fullname || 'Desconhecido'}</span>
                     </div>
                     <div className="pedido-info-item">
                       <strong>Data:</strong> 

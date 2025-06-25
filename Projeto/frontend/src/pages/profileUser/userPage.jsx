@@ -28,7 +28,7 @@ function UserPage() {
   const navigate = useNavigate();
   const { changePassword, usersLoading, error: usersError } = useUsersServices();
   const [error, setError] = useState('');
-  const [ success, setSuccess] = useState('');
+  const [success, setSuccess] = useState('');
 
   // Estados para trocar senha
   const [passwordForm, setPasswordForm] = useState({
@@ -37,7 +37,6 @@ function UserPage() {
     confirmNewPassword: '',
   });
   const [passwordErrors, setPasswordErrors] = useState({});
-
   const [showOldPassword, setShowOldPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmNewPassword, setShowConfirmNewPassword] = useState(false);
@@ -47,8 +46,8 @@ function UserPage() {
     setUltimasEscolhas(ultimos);
   }, [carrinho]);
 
-  useEffect(()=> {
-    if(refetchOrders && user?._id){
+  useEffect(() => {
+    if (refetchOrders && user?._id) {
       getUserOrders(user._id);
     }
   }, [refetchOrders, user?._id]);
@@ -65,7 +64,7 @@ function UserPage() {
       errors.newPassword = 'Nova senha é obrigatória';
     } else if (newPassword.length < 5) {
       errors.newPassword = 'A senha deve ter pelo menos 5 caracteres';
-    } 
+    }
     if (!confirmNewPassword) {
       errors.confirmNewPassword = 'Confirmação da senha é obrigatória';
     } else if (newPassword !== confirmNewPassword) {
@@ -115,38 +114,36 @@ function UserPage() {
 
   return (
     <div className="user-page" style={{ backgroundImage: `url(${bgImage})` }}>
-
       <div className="user-content">
-      <div className="user-icons-links">
-        <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
-          <FiHome size={20} />
-        </Link>
-        <Link to="/cart" className="user-icon-link" title="Carrinho">
-          <FiShoppingCart size={20} />
-        </Link>
-        <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
-          <MdRestaurantMenu size={20} />
-        </Link>
-        <button className="user-icon-link" title="Sair" onClick={handleLogout}>
-          <FiLogOut size={20} />
-        </button>
-      </div>
+        <div className="user-icons-links">
+          <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
+            <FiHome size={20} />
+          </Link>
+          <Link to="/cart" className="user-icon-link" title="Carrinho">
+            <FiShoppingCart size={20} />
+          </Link>
+          <Link to="/cardapio-user" className="user-icon-link" title="Cardápio">
+            <MdRestaurantMenu size={20} />
+          </Link>
+          <button className="user-icon-link" title="Sair" onClick={handleLogout}>
+            <FiLogOut size={20} />
+          </button>
+        </div>
         <div className="user-header">
-                {error && (
-              <MessageBox
-                message= {error}
-                type="error"
-                onClose={() => setError(false)}
-              />
-            )}
-            {success && (
-              <MessageBox
-                message= {success}
-                type="success"
-                onClose={() => setSuccess(false)}
-              />
-            )}
-
+          {error && (
+            <MessageBox
+              message={error}
+              type="error"
+              onClose={() => setError('')}
+            />
+          )}
+          {success && (
+            <MessageBox
+              message={success}
+              type="success"
+              onClose={() => setSuccess('')}
+            />
+          )}
           <h1>Olá, {user?.fullname || 'Usuário'}</h1>
         </div>
 
@@ -181,27 +178,39 @@ function UserPage() {
           )}
         </div>
 
-         <div className="user-section">
-          <h2>Pedidos Atuais</h2>
+        <div className="user-section">
+          <div className="user-section-header">
+            <h2>Pedidos Atuais</h2>
+          </div>
           {orderLoading ? (
             <p>Carregando pedidos...</p>
           ) : pedidosAtuais.length === 0 ? (
             <p>Você não possui pedidos em andamento.</p>
           ) : (
-            <ul>
+            <div className="orders-container">
               {pedidosAtuais.map((pedido) => (
-                <li key={pedido._id}>
-                  <strong>Status:</strong> {statusMap[pedido.pickupStatus] || pedido.pickupStatus}
-                  <ul>
-                    {pedido.orderItems?.map((item, idx) => (
-                      <li key={idx}>
-                        {item.name} <b>x{item.quantidade}</b>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
+                <div key={pedido._id} className="order-card">
+                  <div className="order-card-header">
+                    <span className="order-date">
+                      {new Date(pedido.createdAt).toLocaleString('pt-BR')}
+                    </span>
+                    <span className={`order-status status-${pedido.pickupStatus.toLowerCase()}`}>
+                      {statusMap[pedido.pickupStatus] || pedido.pickupStatus}
+                    </span>
+                  </div>
+                  <div className="order-card-body">
+                    <h3>Itens:</h3>
+                    <ul className="order-items">
+                      {pedido.orderItems?.map((item, idx) => (
+                        <li key={idx}>
+                          {item.name} <span>x{item.quantidade}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
 
@@ -212,20 +221,30 @@ function UserPage() {
           ) : pedidosAnteriores.length === 0 ? (
             <p>Você não possui pedidos anteriores.</p>
           ) : (
-            <ul>
+            <div className="orders-container">
               {pedidosAnteriores.map((pedido) => (
-                <li key={pedido._id}>
-                  <strong>Status:</strong> {statusMap[pedido.pickupStatus] || pedido.pickupStatus}
-                  <ul>
-                    {pedido.orderItems?.map((item, idx) => (
-                      <li key={idx}>
-                        {item.name} <b>x{item.quantidade}</b>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
+                <div key={pedido._id} className="order-card">
+                  <div className="order-card-header">
+                    <span className="order-date">
+                      {new Date(pedido.createdAt).toLocaleString('pt-BR')}
+                    </span>
+                    <span className={`order-status status-${pedido.pickupStatus.toLowerCase()}`}>
+                      {statusMap[pedido.pickupStatus] || pedido.pickupStatus}
+                    </span>
+                  </div>
+                  <div className="order-card-body">
+                    <h3>Itens:</h3>
+                    <ul className="order-items">
+                      {pedido.orderItems?.map((item, idx) => (
+                        <li key={idx}>
+                          {item.name} <span>x{item.quantidade}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
 
@@ -285,7 +304,6 @@ function UserPage() {
               >
                 {showNewPassword ? <FiEyeOff /> : <FiEye />}
               </button>
-
               {passwordErrors.newPassword && (
                 <span id="newPassword-error" className="error-text">
                   {passwordErrors.newPassword}

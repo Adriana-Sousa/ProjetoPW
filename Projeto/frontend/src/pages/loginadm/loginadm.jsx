@@ -4,10 +4,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FiHome, FiLock, FiKey } from 'react-icons/fi';
 import { useState, useEffect} from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import MessageBox from '../../components/message/message';
 
 function LoginAdm() {
   const navigate = useNavigate();
-  const { login, authLoading, error, success, isAuthenticated, user, setSuccess } = useAuth();
+  const { login, authLoading, error, success, isAuthenticated, user, setSuccess, setError } = useAuth();
+  const [feedeback, setFeedeback] = useState("");
 
   const [formData, setFormData] = useState({
     email: '',
@@ -44,9 +46,11 @@ function LoginAdm() {
     e.preventDefault();
 
     if (!formData.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      setFeedeback("Informe um email válido.");
       return;
     }
-    if (!formData.password.trim()) {
+    if (!formData.password.trim() || formData.password.length <= 5) {
+      setFeedeback("Informe sua senha.")
       return;
     }
 
@@ -69,6 +73,20 @@ function LoginAdm() {
       className="login-page" 
       style={{ backgroundImage: `url(${bgImage})` }}
     >
+      {error && (
+        <MessageBox
+          message= {error}
+          type="error"
+          onClose={() => setError(false)}
+        />
+      )}
+      {success && (
+        <MessageBox
+          message= {success}
+          type="success"
+          onClose={() => setSuccess(false)}
+        />
+      )}
       <div className="login-container">
         <div style={{ position: 'absolute', top: '20px', right: '10px' }}>
           <Link to="/">
@@ -76,8 +94,7 @@ function LoginAdm() {
           </Link>
         </div>
         <h1>OLÁ, ADMINISTRADOR</h1>
-        {error && <p className="error">{error}</p>}
-        {success && <p className="success">{success}</p>}
+        {feedeback && <p className="error">{feedeback}</p>}
         {authLoading && <p className="loading">Carregando...</p>}
         <form onSubmit={handleSubmitForm}>
           <div className="input-group">

@@ -14,11 +14,11 @@ function CardapioUsuario() {
   const [pratoSelecionado, setPratoSelecionado] = useState(null);
   const [busca, setBusca] = useState('');
   const [mostrarCarrinho, setMostrarCarrinho] = useState(false);
-  const { favoritos, toggleFavorito, favoritesLoading, favoritesError, isFavorited , atualizarFavoritos} = useFavorites();
+  const { toggleFavorito, favoritesLoading, favoritesError, isFavorited , atualizarFavoritos} = useFavorites();
   const navigate = useNavigate();
   const { carrinho, adicionarAoCarrinho, limparCarrinho } = useCarrinho();
   const { getAvailablePlates, platesList, platesLoading, refetchPlates } = usePlatesServices();
-  const { logout, isAuthenticated, user } = useAuth();
+  const { logout } = useAuth();
 
   useEffect(() => {
     
@@ -28,6 +28,7 @@ function CardapioUsuario() {
     }
   }, [ getAvailablePlates, refetchPlates]);
 
+  //exibir modal do prato selecionado
   const abrirModal = (prato) => setPratoSelecionado(prato);
   const fecharModal = () => setPratoSelecionado(null);
 

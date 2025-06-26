@@ -141,11 +141,6 @@ export default function OrderServices() {
 
   // Adicionar uma ordem
   const sendOrder = async (orderData) => {
-    const validationErrors = validateOrderData(orderData);
-    if (validationErrors) {
-      console.error('sendOrder: Dados inválidos:', validationErrors);
-      return { success: false, error: validationErrors.join('; '), statusCode: 400 };
-    }
 
     const result = await handleFetch(`${baseUrl}/`, {
       method: 'POST',

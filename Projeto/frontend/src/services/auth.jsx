@@ -73,7 +73,6 @@ export default function AuthServices() {
     localStorage.removeItem('auth');
     localStorage.removeItem('carrinho');
     localStorage.removeItem('favorites');
-    localStorage.removeItem('favorites');
     setSuccess("Logout realizado com sucesso!");
     return { success: true };
   };

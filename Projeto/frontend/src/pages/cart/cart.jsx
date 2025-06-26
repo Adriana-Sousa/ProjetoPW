@@ -4,14 +4,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useCarrinho } from '../../context/carrinhoContext';
 import { useAuth } from '../../hooks/useAuth';
+import OrderServices from '../../services/orders';
+import MessageBox from '../../components/message/message';
 
 function Carrinho() {
   const { carrinho, removerItem, incrementarQuantidade, decrementarQuantidade, total, limparCarrinho } = useCarrinho();
-  const { user, token, logout } = useAuth();
+  const { user, logout } = useAuth();
+  const {sendOrder} = OrderServices();
+  const [error, setError] = useState('');
 
   const [mostrarPopup, setMostrarPopup] = useState(false);
   const navigate = useNavigate();
 
+// faz o pedido
 const finalizarCompra = async () => {
   const pedido = {
     userId: user?._id,
@@ -25,25 +30,16 @@ const finalizarCompra = async () => {
   };
 
   try {
-    const response = await fetch('http://localhost:3000/orders', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify(pedido)
-       });
-
-      const result = await response.json();
+      const result = await sendOrder(pedido);
       if (result.success) {
         setMostrarPopup(true);
         limparCarrinho();
       } else {
-        alert('Erro ao finalizar pedido!');
+        setError('Erro ao finalizar pedido!');
       }
     } catch (error) {
        console.error(error);
-       alert('Erro de comunicação com o servidor!');
+       setError('Erro de comunicação com o servidor!');
       }
   };
 
@@ -66,7 +62,13 @@ const finalizarCompra = async () => {
         </Link>
         <h1>Carrinho</h1>
       </header>
-
+    {error && (
+            <MessageBox
+              message={error}
+              type="error"
+              onClose={() => setError(false)}
+            />
+          )}
       {carrinho.length === 0 ? (
         <p className="carrinho-vazio">Seu carrinho está vazio.</p>
       ) : (

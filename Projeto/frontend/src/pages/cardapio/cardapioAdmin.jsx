@@ -233,7 +233,7 @@ function CardapioAdmin() {
               <option value="sobremesa">Sobremesa</option>
               <option value="bebida">Bebida</option>
             </select>
-            <label>
+            <label className="modal-checkbox-label">
               <input
                 type="checkbox"
                 checked={formData.available}

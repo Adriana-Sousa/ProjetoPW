@@ -1,17 +1,33 @@
 .message-box {
   position: fixed;
-  top: 16px;
-  right: 16px;
+  top: 20px;
+  right: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
-  width: 300px; 
-  border-left: 4px solid;
-  border-radius: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 14px;
-  z-index: 1000; 
+  padding: 8px 12px;
+  max-width: 280px;
+  width: auto;
+  min-width: 200px;
+  border-left: 3px solid;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  font-size: 0.85rem;
+  font-weight: 500;
+  z-index: 1001;
+  backdrop-filter: blur(10px);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
 }
 
 .message-box__text {
@@ -19,39 +35,53 @@
 }
 
 .message-box__close {
-  margin-left: 16px;
+  margin-left: 12px;
   background: none;
   border: none;
-  font-size: 14px;
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  color: #333;
+  color: inherit;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+  padding: 2px;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .message-box__close:hover {
-  color: #666;
+  opacity: 1;
+  background-color: rgba(0, 0, 0, 0.1);
 }
 
 .message-box--info {
-  background-color: #e6f3ff;
+  background-color: rgba(74, 144, 226, 0.15);
   border-color: #4a90e2;
-  color: #333;
+  color: #2c5aa0;
+  backdrop-filter: blur(10px);
 }
 
 .message-box--success {
-  background-color: #e6ffee;
+  background-color: rgba(33, 150, 83, 0.15);
   border-color: #219653;
-  color: #333;
+  color: #1a7a42;
+  backdrop-filter: blur(10px);
 }
 
 .message-box--error {
-  background-color: #ffe6e6;
+  background-color: rgba(235, 87, 87, 0.15);
   border-color: #eb5757;
-  color: #333;
+  color: #c53030;
+  backdrop-filter: blur(10px);
 }
 
 .message-box--warning {
-  background-color: #fff3e6;
+  background-color: rgba(242, 153, 74, 0.15);
   border-color: #f2994a;
-  color: #333;
+  color: #d69e2e;
+  backdrop-filter: blur(10px);
 }

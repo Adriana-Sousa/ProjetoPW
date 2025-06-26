@@ -40,7 +40,7 @@ function AdminPage() {
   const [nome, setNome] = useState('');
   const [descricao, setDescricao] = useState('');
   const [preco, setPreco] = useState('');
-  const [categoria, setCategoria] = useState('sobremesa');
+  const [categoria, setCategoria] = useState('');
   const [ingredientes, setIngredientes] = useState('');
   const [imgUrl, setImgUrl] = useState('');
 
@@ -114,7 +114,7 @@ function AdminPage() {
       setError(`Erro ao alterar senha: ${result.error || 'Erro desconhecido'}`);
     }
   };
-
+ //adicionar um novo prato 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -128,14 +128,14 @@ function AdminPage() {
         : [],
       imgUrl: imgUrl || null,
     };
-
+// tratamento de respostas
     const response = await addPlate(novoPrato);
     if (response.success) {
       setSuccess('Prato adicionado com sucesso!');
       setNome('');
       setDescricao('');
       setPreco('');
-      setCategoria('sobremesa');
+      setCategoria('');
       setIngredientes('');
       setImgUrl('');
       setRefetchPlates(true);
